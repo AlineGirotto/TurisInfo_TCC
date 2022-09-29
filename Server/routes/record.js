@@ -1,11 +1,10 @@
-const Note = require('../models/note');
+const Note = require('../models/Passageiro');
 const express = require("express");
 const recordRoutes = express.Router();
 const dbo = require("../db/conn");
-const ObjectId = require("mongodb").ObjectId;
 
-recordRoutes.route("/registro").get(function (req, res) {
-  let db_connect = dbo.getDb("test");
+recordRoutes.route("/").get(function (req, res) {
+  let db_connect = dbo.getDb("");
   db_connect
     .collection("passageiros")
     .find({})
