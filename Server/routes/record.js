@@ -1,17 +1,20 @@
-const Note = require('../models/Passageiro');
 const express = require("express");
 const recordRoutes = express.Router();
 const dbo = require("../db/conn");
 
-recordRoutes.route("/").get(function (req, res) {
-  let db_connect = dbo.getDb("");
-  db_connect
-    .collection("passageiros")
-    .find({})
-    .toArray(function (err, result) {
-      if (err) throw err;
-      res.json(result);
-    });
+recordRoutes.route("/record/addViagem").post(function (req, response) {
+  let db_connect = dbo.getDb();
+  let myobj = {
+    Data: req.body.Data,
+    Nome: req.body.Nome,
+    Ida: req.body.Ida,
+    Volta: req.body.Volta,
+  };
+
+  db_connect.collection("viagens").insertOne(myobj, function (err, res) {
+    if (err) throw err;
+    response.json(res);
+  });
 });
 
 module.exports = recordRoutes;

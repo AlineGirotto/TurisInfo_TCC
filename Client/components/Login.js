@@ -9,10 +9,10 @@ import {
 } from "react-native";
 import React, { useState, useEffect } from "react";
 
-export default function Login({ navigation }) {
+export default function Login() {
   return (
     <KeyboardAvoidingView style={styles.background}>
-      <View style={[styles.container, {backgroundColor: 'rgba(0, 173, 232,0.3)'}]}>
+      <View style={styles.container}>
         <View style={styles.Logo}>
           <Text>LOGO</Text>
         </View>
@@ -24,9 +24,10 @@ export default function Login({ navigation }) {
             onChange={() => {}}
           />
           <TextInput
-            style={styles.input}
+            style={styles.input}            
             placeholder="Digite sua senha"
             autoCorrect={false}
+            secureTextEntry
             onChange={() => {}}
           />
           <TouchableOpacity

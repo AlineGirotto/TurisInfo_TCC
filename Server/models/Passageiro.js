@@ -8,10 +8,10 @@ const pas = new mongoose.Schema({
     Estadocivil: String,
     Contato: String,
     Email: String,
-    CEP: Integer,
+    CEP: { type: Number, default: 0 },
     Rua: String,
     Bairro: String,
-    Numero: Integer,
+    Numero: { type: Number, default: 0 },
     Complemento: String,
     Contrato: String,
 });
