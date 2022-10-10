@@ -11,7 +11,7 @@ import SelectDropdown from "react-native-select-dropdown";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function listaViagem() {
+export default function ListaViagem() {
   const Turnos = ["Manhã", "Tarde", "Noite", "Não"];
   const [form, setForm] = useState({
     Data: "",
@@ -74,46 +74,42 @@ export default function listaViagem() {
         <View style={styles.container3}>
           <View style={styles.container4}>
             <View style={styles.selectDate}>
-              <TextInput
-                style={{
-                  backgroundColor: "#F5F5F5",
-                  width: "50%",
-                  color: "#000000",
-                  fontSize: 17,
-                  borderRadius: 10,
-                  borderColor: "#004A85",
-                  borderWidth: 1,
-                  padding: 10,
-                  shadowColor: "black",
-                  shadowOffset: {
-                    width: 0,
-                    height: 6,
-                  },
-                  shadowOpacity: 0.37,
-                  shadowRadius: 7.49,
-                  elevation: 12,
-                }}
-                placeholder="Data"
-                autoCorrect={false}
-                value={form.Data}
-                onChange={(e) => updateForm({ Data: e.target.value })}
-                
-              />
-              {!datePicker && (
-                <TouchableOpacity
+              <View style={styles.sectionStyle}>
+                <TextInput
                   style={{
-                    backgroundColor: "#004A85",
-                    width: "40%",
-                    height: 45,
-                    alignItems: "center",
-                    justifyContent: "center",
+                    backgroundColor: "#F5F5F5",
+                    color: "#000000",
+                    width:"50%",
+                    fontSize: 17,
                     borderRadius: 10,
+                    borderColor: "#004A85",
+                    borderWidth: 1,
+                    padding: 10,
+                    shadowColor: "black",
+                    shadowOffset: {
+                      width: 0,
+                      height: 6,
+                    },
+                    shadowOpacity: 0.37,
+                    shadowRadius: 7.49,
+                    elevation: 12,
                   }}
-                  onPress={showDatePicker}
-                >
-                  <Text style={styles.textBtn}>Selecione</Text>
-                </TouchableOpacity>
-              )}
+                  placeholder="Data"
+                  autoCorrect={false}
+                  value={form.Data}
+                  underlineColorAndroid="transparent"
+                  onChange={(e) => updateForm({ Data: e.target.value })}
+                />
+                {!datePicker && (
+                  <Ionicons
+                    name="search-circle-outline"
+                    color={"#004A85"}
+                    size={40}
+                    onPress={showDatePicker}
+                    style={styles.imageStyle}
+                  />
+                )}
+              </View>
             </View>
             {datePicker && (
               <DateTimePicker
@@ -226,7 +222,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#DFDFDF",
-    width: "90%",
+    width: "95%",
     borderRadius: 15,
     borderWidth: 2,
     borderColor: "#004A85",
@@ -255,10 +251,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "90%",
     maxHeight: "10%",
+    marginBottom: 10,
   },
   input: {
     backgroundColor: "#F5F5F5",
-    width: "50%",
+    width: "60%",
     marginBottom: 15,
     color: "#000000",
     fontSize: 17,
@@ -289,7 +286,7 @@ const styles = StyleSheet.create({
   },
   datePicker: {
     backgroundColor: "#F5F5F5",
-    width: "50%",
+    width: "60%",
     marginBottom: 15,
     color: "#000000",
     fontSize: 17,
@@ -309,7 +306,7 @@ const styles = StyleSheet.create({
   },
   drop: {
     backgroundColor: "#F5F5F5",
-    width: "50%",
+    width: "60%",
     marginBottom: 15,
     color: "#000000",
     fontSize: 17,
@@ -325,5 +322,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.37,
     shadowRadius: 7.49,
     elevation: 12,
+  },
+  sectionStyle: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  imageStyle: {
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

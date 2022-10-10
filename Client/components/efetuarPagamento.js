@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { React } from "react";
 
-export default function ConsultaMensalidade() {
+export default function efetuarPagamento() {
   return (
     <View style={styles.container}>
       <View style={styles.container2}>

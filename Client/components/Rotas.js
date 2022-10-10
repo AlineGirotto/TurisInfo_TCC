@@ -6,6 +6,7 @@ import home from "./Home";
 import mensalidade from "./consultamensalidade";
 import viagem from './listaViagem';
 import {Ionicons} from '@expo/vector-icons';
+import Login from "./Login";
 
 const Tab = createBottomTabNavigator();
 
@@ -13,7 +14,7 @@ export default function Rotas() {
   return (
     <NavigationContainer style={styles.container}>
       <Tab.Navigator
-        initialRouteName={"Registar Viagem"}
+        initialRouteName={Login}
         screenOptions={{ tabBarShowLabel: true, tabBarStyle:{
           position: 'absolute',
           backgroundColor: "#004A85",
@@ -38,7 +39,7 @@ export default function Rotas() {
         <Tab.Screen name="Consultar Mensalidade" component={mensalidade} options={{
           headerShown: true,
           headerTitle: '',
-          headerStyle: ({backgroundColor: "#004A85", }) ,
+          headerStyle: ({backgroundColor: "#004A85" }) ,
           tabBarIcon:({size, focused}) => {
             if(focused){
               return <Ionicons name="folder-open" size={size} color={"white"}/>

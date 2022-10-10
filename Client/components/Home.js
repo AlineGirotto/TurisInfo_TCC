@@ -1,24 +1,63 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Card } from "react-native-paper";
 import { React } from "react";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Home({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.container2}>
-        <Text style={{ padding: 10, fontWeight: "bold", fontSize: 20 }}>
+        <Text style={{ padding: 10, fontWeight: "bold", fontSize: 25 }}>
           Seja bem vindo(a)!
         </Text>
         <View style={styles.cards}>
-          <Card style={styles.card} 
-        onPress={() => navigation.navigate('Consultar Mensalidade')}>
-            <Text>Consultar as mensalidades</Text>
+          <Card
+            style={styles.card}
+            onPress={() => navigation.navigate("Consultar Mensalidade")}
+          >
+            <Text
+              style={{ textAlign: "center", fontSize: 15, color: "#004A85" }}
+            >
+              Consultar as mensalidades
+            </Text>
+            <Ionicons
+              name="ios-document-text-outline"
+              size={45}
+              color={"#004A85"}
+              style={styles.icon}
+            />
           </Card>
-          <Card style={styles.card}  onPress={() => navigation.navigate('Registar Viagem')}>
-            <Text>Registrar horário das Viagens</Text>
+          <Card
+            style={styles.card}
+            onPress={() => navigation.navigate("Registar Viagem")}
+          >
+            <Text
+              style={{ textAlign: "center", fontSize: 15, color: "#004A85" }}
+            >
+              Registrar horário de viagem
+            </Text>
+            <Ionicons
+              name="md-time-outline"
+              size={45}
+              color={"#004A85"}
+              style={styles.icon}
+            />
           </Card>
-          <Card style={styles.card}  onPress={() => navigation.navigate('Efetuar Pagamento')}>
-            <Text>Efetuar pagamentos</Text>
+          <Card
+            style={styles.card}
+            onPress={() => navigation.navigate("Efetuar Pagamento")}
+          >
+            <Text
+              style={{ textAlign: "center", fontSize: 15, color: "#004A85" }}
+            >
+              Efetuar pagamentos
+            </Text>
+            <Ionicons
+              name="md-cash-outline"
+              size={45}
+              color={"#004A85"}
+              style={styles.icon}
+            />
           </Card>
         </View>
       </View>
@@ -42,23 +81,22 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderWidth: 1,
     borderColor: "#004A85",
-    marginTop: '1%',
-    marginBottom: '5%'
+    marginTop: "1%",
+    marginBottom: "5%",
   },
-  cards:{
+  cards: {
     flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: "center",
+    flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "center",
-    marginTop: '5%'
+    marginTop: "3%",
   },
   card: {
     backgroundColor: "#ffffff",
     alignItems: "center",
     padding: 10,
-    height: "20%",
-    width: "30%",
+    maxWidth: "30%",
+    maxHeight: 150,
     borderRadius: 20,
     shadowColor: "#000",
     shadowOffset: {
@@ -66,7 +104,14 @@ const styles = StyleSheet.create({
       height: 5,
     },
     shadowOpacity: 0.75,
-    shadowRadius: 5,    
-    margin: '10%',
+    shadowRadius: 5,
+    margin: "5%",
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "#004A85",
+  },
+  icon: {
+    textAlign: "center",
+    padding: '20%',
   },
 });

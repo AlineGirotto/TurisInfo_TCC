@@ -1,18 +1,16 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, StatusBar, View } from "react-native";
 import React from "react";
-import Rotas from './components/Rotas';
+import Rotas from "./components/Rotas";
 
 export default function App() {
   return (
-    <Rotas/>
+      <Rotas />
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#DFDFDF",
-    alignItems: "center",
-    justifyContent: "center",
+    paddingTop: StatusBar.currentHeight,
   },
 });
