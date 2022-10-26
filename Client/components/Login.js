@@ -5,35 +5,58 @@ import {
   KeyboardAvoidingView,
   Image,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
-export default function Login() {
+export default function Login({ navigation }) {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+
+  async function login() {
+    await signInWithEmailAndPassword(auth, email, senha).then(value =>{
+      //console.log('Login realizado ');      
+      navigation.navigate("Home");
+    }).catch(error => console.log(error));
+  }
+
   return (
     <KeyboardAvoidingView style={styles.background}>
       <View style={styles.container}>
         <View style={styles.Logo}>
-          <Text>LOGO</Text>
+          <Text style={{fontSize: 25}}>Faça o login</Text>
         </View>
         <View style={styles.login}>
           <TextInput
             style={styles.input}
-            placeholder="Digite seu login"
+            placeholder="Digite seu e-mail"
             autoCorrect={false}
-            onChange={() => {}}
+            value={email}
+            onChangeText={setEmail}
           />
           <TextInput
-            style={styles.input}            
+            style={styles.input}
             placeholder="Digite sua senha"
             autoCorrect={false}
             secureTextEntry
-            onChange={() => {}}
+            value={senha}
+            onChangeText={setSenha}
           />
+          <TouchableOpacity
+            style={styles.btn2}
+            title="Cadastrar login"
+            onPress={() => navigation.navigate("CriarLogin")}
+          >
+            <Text style={{ color: "#004A85", fontSize: 15 }}>
+              Cadastrar-se
+            </Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.btn}
             title="Entrar"
-            onPress={() => navigation.navigate("Home")}
+            onPress={login}
           >
             <Text style={styles.textBtn}>Acessar</Text>
           </TouchableOpacity>
@@ -54,15 +77,24 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "80%",
     maxHeight: "70%",
-    margin: '10%',
+    margin: "10%",
+    backgroundColor: "#A4E3F9",
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#004A85',
+    borderColor: "#004A85",
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 12,
+    },
+    shadowOpacity: 0.58,
+    shadowRadius: 16.0,
+    elevation: 24,
   },
   Logo: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    marginTop: "10%"
   },
   login: {
     flex: 1,
@@ -85,6 +117,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
+  },
+  btn2: {
+    width: "90%",
+    height: 45,
+    alignItems: "flex-end",
+    justifyContent: "center",
   },
   textBtn: {
     color: "#ffffff",

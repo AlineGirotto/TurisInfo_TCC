@@ -5,25 +5,62 @@ import {
   TouchableOpacity,
   TextInput,
   Platform,
+  Button,
 } from "react-native";
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import SelectDropdown from "react-native-select-dropdown";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebaseConfig";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import DatePicker from "react-datepicker";
 
-export default function ListaViagem() {
+export default function ListaViagem({ navigation }) {
   const Turnos = ["Manhã", "Tarde", "Noite", "Não"];
+  const [tela, setTela] = useState(false);
+  const [datePicker, setDatePicker] = useState(tela);
+  const [data, setDate] = useState(new Date());
   const [form, setForm] = useState({
     Data: "",
     Nome: "",
     Ida: "",
     Volta: "",
   });
-  const [datePicker, setDatePicker] = useState(false);
-  const [data, setDate] = useState(new Date());
+
+  function updateForm(value) {
+    return setForm((prev) => {
+      return { ...prev, ...value };
+    });
+  }
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const uid = user.uid;
+      } else {
+        navigation.navigate("Home");
+      }
+    });
+
+    Platform.select({
+      native: () => setTela(true),
+      default: () => setTela(false),
+    })();
+  }, []);
 
   function showDatePicker() {
     setDatePicker(true);
+    return (
+      <View style={styles.container}>
+        <DateTimePicker
+          value={data}
+          mode={"date"}
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={onDateSelected}
+          style={styles.datePicker}
+        />
+      </View>
+    );
   }
 
   function onDateSelected(event, value) {
@@ -36,26 +73,38 @@ export default function ListaViagem() {
     setDatePicker(false);
   }
 
-  function updateForm(value) {
-    return setForm((prev) => {
-      return { ...prev, ...value };
-    });
+  function getData(tela) {
+    if (tela) {
+      return <View style={styles.container}>
+        <TouchableOpacity style={styles.btn} onPress={showDatePicker}>
+            <Text style={styles.textBtn}>Selecionar data</Text>
+          </TouchableOpacity>
+      </View>;
+    } else {
+      return (
+        <View
+          style={{
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <TextInput
+            style={styles.input}
+            placeholder="Data da viagem"
+            autoCorrect={false}
+            value={form.Data}
+            onChange={(e) => updateForm({ Data: e.target.value })}
+          />
+        </View>
+      );
+    }
   }
 
   async function onSubmit(e) {
     e.preventDefault();
 
-    const newV = { ...form };
-
-    await fetch("http://localhost:5000/record/addViagem", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newV),
-    }).catch((error) => {
-      window.alert(error);
-    });
+    console.log(form);
 
     setForm({
       Data: "",
@@ -63,8 +112,8 @@ export default function ListaViagem() {
       Ida: "",
       Volta: "",
     });
-    window.location.reload();
   }
+
   return (
     <View style={styles.container}>
       <View style={styles.container2}>
@@ -72,118 +121,69 @@ export default function ListaViagem() {
           Registre o horário de sua viagem
         </Text>
         <View style={styles.container3}>
-          <View style={styles.container4}>
-            <View style={styles.selectDate}>
-              <View style={styles.sectionStyle}>
-                <TextInput
-                  style={{
-                    backgroundColor: "#F5F5F5",
-                    color: "#000000",
-                    width:"50%",
-                    fontSize: 17,
-                    borderRadius: 10,
-                    borderColor: "#004A85",
-                    borderWidth: 1,
-                    padding: 10,
-                    shadowColor: "black",
-                    shadowOffset: {
-                      width: 0,
-                      height: 6,
-                    },
-                    shadowOpacity: 0.37,
-                    shadowRadius: 7.49,
-                    elevation: 12,
-                  }}
-                  placeholder="Data"
-                  autoCorrect={false}
-                  value={form.Data}
-                  underlineColorAndroid="transparent"
-                  onChange={(e) => updateForm({ Data: e.target.value })}
+          {getData(tela)}
+          <TextInput
+            style={styles.input}
+            placeholder="Nome completo"
+            autoCorrect={false}
+            value={form.Nome}
+            onChange={(e) => updateForm({ Nome: e.target.value })}
+          />
+          <SelectDropdown
+            data={Turnos}
+            value={form.Ida}
+            onSelect={(selectedItem, index) => {
+              updateForm({ Ida: selectedItem });
+            }}
+            defaultButtonText={"Turno de ida"}
+            buttonTextAfterSelection={(selectedItem, index) => {
+              return selectedItem;
+            }}
+            rowTextForSelection={(item, index) => {
+              return item;
+            }}
+            renderDropdownIcon={(isOpened) => {
+              return (
+                <Ionicons
+                  name={isOpened ? "chevron-up" : "chevron-down"}
+                  color={"#444"}
+                  size={18}
                 />
-                {!datePicker && (
-                  <Ionicons
-                    name="search-circle-outline"
-                    color={"#004A85"}
-                    size={40}
-                    onPress={showDatePicker}
-                    style={styles.imageStyle}
-                  />
-                )}
-              </View>
-            </View>
-            {datePicker && (
-              <DateTimePicker
-                value={data}
-                mode={"date"}
-                display={Platform.OS === "ios" ? "spinner" : "default"}
-                is24Hour={true}
-                onChange={onDateSelected}
-                style={styles.datePicker}
-              />
-            )}
-            <TextInput
-              style={styles.input}
-              placeholder="Nome completo"
-              autoCorrect={false}
-              value={form.Nome}
-              onChange={(e) => updateForm({ Nome: e.target.value })}
-            />
-            <SelectDropdown
-              data={Turnos}
-              value={form.Ida}
-              onSelect={(selectedItem, index) => {
-                updateForm({ Ida: selectedItem });
-              }}
-              defaultButtonText={"Turno de ida"}
-              buttonTextAfterSelection={(selectedItem, index) => {
-                return selectedItem;
-              }}
-              rowTextForSelection={(item, index) => {
-                return item;
-              }}
-              renderDropdownIcon={(isOpened) => {
-                return (
-                  <Ionicons
-                    name={isOpened ? "chevron-up" : "chevron-down"}
-                    color={"#444"}
-                    size={18}
-                  />
-                );
-              }}
-              dropdownIconPosition={"right"}
-              dropdownStyle={styles.DropdownStyle}
-              buttonStyle={styles.drop}
-            />
-            <SelectDropdown
-              data={Turnos}
-              value={form.Ida}
-              onSelect={(selectedItem, index) => {
-                updateForm({ Volta: selectedItem });
-              }}
-              defaultButtonText={"Turno de volta"}
-              buttonTextAfterSelection={(selectedItem, index) => {
-                return selectedItem;
-              }}
-              rowTextForSelection={(item, index) => {
-                return item;
-              }}
-              renderDropdownIcon={(isOpened) => {
-                return (
-                  <Ionicons
-                    name={isOpened ? "chevron-up" : "chevron-down"}
-                    color={"#444"}
-                    size={18}
-                  />
-                );
-              }}
-              dropdownIconPosition={"right"}
-              dropdownStyle={styles.DropdownStyle}
-              buttonStyle={styles.drop}
-            />
-            <TouchableOpacity style={styles.btn} onPress={onSubmit}>
-              <Text style={styles.textBtn}>Enviar</Text>
-            </TouchableOpacity>
-          </View>
+              );
+            }}
+            dropdownIconPosition={"right"}
+            dropdownStyle={styles.DropdownStyle}
+            buttonStyle={styles.drop}
+          />
+          <SelectDropdown
+            data={Turnos}
+            value={form.Ida}
+            onSelect={(selectedItem, index) => {
+              updateForm({ Volta: selectedItem });
+            }}
+            defaultButtonText={"Turno de volta"}
+            buttonTextAfterSelection={(selectedItem, index) => {
+              return selectedItem;
+            }}
+            rowTextForSelection={(item, index) => {
+              return item;
+            }}
+            renderDropdownIcon={(isOpened) => {
+              return (
+                <Ionicons
+                  name={isOpened ? "chevron-up" : "chevron-down"}
+                  color={"#444"}
+                  size={18}
+                />
+              );
+            }}
+            dropdownIconPosition={"right"}
+            dropdownStyle={styles.DropdownStyle}
+            buttonStyle={styles.drop}
+          />
+          <TouchableOpacity style={styles.btn} onPress={onSubmit}>
+            <Text style={styles.textBtn}>Enviar</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -237,22 +237,6 @@ const styles = StyleSheet.create({
     shadowRadius: 16.0,
     elevation: 24,
   },
-  container4: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
-  },
-  selectDate: {
-    flex: 1,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "90%",
-    maxHeight: "10%",
-    marginBottom: 10,
-  },
   input: {
     backgroundColor: "#F5F5F5",
     width: "60%",
@@ -284,17 +268,6 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontSize: 16,
   },
-  datePicker: {
-    backgroundColor: "#F5F5F5",
-    width: "60%",
-    marginBottom: 15,
-    color: "#000000",
-    fontSize: 17,
-    borderRadius: 10,
-    borderColor: "#004A85",
-    borderWidth: 1,
-    padding: 10,
-  },
   DropdownStyle: {
     backgroundColor: "#ffffff",
     height: 125,
@@ -322,14 +295,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.37,
     shadowRadius: 7.49,
     elevation: 12,
-  },
-  sectionStyle: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  imageStyle: {
-    alignItems: "center",
-    justifyContent: "center",
   },
 });

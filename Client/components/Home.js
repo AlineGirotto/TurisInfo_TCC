@@ -1,9 +1,12 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Card } from "react-native-paper";
-import { React } from "react";
+import { React, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
 export default function Home({ navigation }) {
+
   return (
     <View style={styles.container}>
       <View style={styles.container2}>
@@ -79,10 +82,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#A4E3F9",
     width: "90%",
     borderRadius: 15,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: "#004A85",
     marginTop: "1%",
     marginBottom: "5%",
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 12,
+    },
+    shadowOpacity: 0.58,
+    shadowRadius: 16.0,
+    elevation: 24,
   },
   cards: {
     flex: 1,
@@ -112,6 +123,6 @@ const styles = StyleSheet.create({
   },
   icon: {
     textAlign: "center",
-    padding: '20%',
+    padding: "20%",
   },
 });

@@ -5,9 +5,22 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import { React } from "react";
+import { React, useEffect } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
-export default function efetuarPagamento() {
+export default function efetuarPagamento({ navigation }) {
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const uid = user.uid;
+      } else {
+        navigation.navigate("Home");
+      }
+    });
+  },[]);
+
   return (
     <View style={styles.container}>
       <View style={styles.container2}>
