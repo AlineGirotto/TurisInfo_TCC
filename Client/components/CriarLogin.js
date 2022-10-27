@@ -8,16 +8,27 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebaseConfig";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { collection, addDoc, getFirestore } from "firebase/firestore";
 
 export default function CriarLogin({ navigation }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
   async function cadastrarLogin() {
+    const auth = getAuth();
+    const db = getFirestore();
     await createUserWithEmailAndPassword(auth, email, senha).then(value =>{
-      navigation.navigate("Login");
+      try {
+        const docRef = addDoc(collection(db, "Usuarios"), {
+          Usuario: email,
+          Adm: false
+        });        
+        navigation.navigate("Login");
+        alert("Cadastro realizado!");
+      } catch (e) {
+        console.error("Erro ao adicionar o documento: ", e);
+      }
     }).catch(error => console.log(error));
   }
 

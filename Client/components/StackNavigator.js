@@ -11,6 +11,7 @@ import mensalidade from "./consultamensalidade";
 import viagem from "./listaViagem";
 import Login from "./Login";
 import CriarLogin from "./CriarLogin";
+import HomeAdm from "./HomeAdm";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -116,6 +117,7 @@ export default function StackNavigator() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="CriarLogin" component={CriarLogin} />
         <Stack.Screen name="TabNavi" component={TabNavi} />
+        <Stack.Screen name="HomeAdm" component={HomeAdm} />
       </Stack.Navigator>
     </NavigationContainer>
   );

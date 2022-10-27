@@ -10,22 +10,40 @@ import {
 import { useState, useEffect } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebaseConfig";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  getFirestore,
+} from "firebase/firestore";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
   async function login() {
-    await signInWithEmailAndPassword(auth, email, senha).then(value =>{  
-      navigation.navigate("TabNavi");
-    }).catch(error => alert("Erro no login"));
+    const db = getFirestore();
+    const q = query(collection(db, "Usuarios"), where("Usuario", "==", email));
+    const querySnapshot = await getDocs(q);
+    await signInWithEmailAndPassword(auth, email, senha)
+      .then((value) => {
+        querySnapshot.forEach((doc) => {
+          if (doc.data().Adm) {
+            navigation.navigate("HomeAdm");
+          } else {
+            navigation.navigate("TabNavi");
+          }
+        });
+      })
+      .catch((error) => alert("Erro no login"));
   }
 
   return (
     <KeyboardAvoidingView style={styles.background}>
       <View style={styles.container}>
         <View style={styles.Logo}>
-          <Text style={{fontSize: 25}}>Faça o login</Text>
+          <Text style={{ fontSize: 25 }}>Faça o login</Text>
         </View>
         <View style={styles.login}>
           <TextInput
@@ -42,12 +60,8 @@ export default function Login({ navigation }) {
             secureTextEntry
             value={senha}
             onChangeText={setSenha}
-          />          
-          <TouchableOpacity
-            style={styles.btn}
-            title="Entrar"
-            onPress={login}
-          >
+          />
+          <TouchableOpacity style={styles.btn} title="Entrar" onPress={login}>
             <Text style={styles.textBtn}>Acessar</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -55,9 +69,7 @@ export default function Login({ navigation }) {
             title="Cadastrar login"
             onPress={() => navigation.navigate("CriarLogin")}
           >
-            <Text style={{ color: "#004A85", fontSize: 15 }}>
-              Cadastrar-se
-            </Text>
+            <Text style={{ color: "#004A85", fontSize: 15 }}>Cadastrar-se</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -93,7 +105,7 @@ const styles = StyleSheet.create({
   Logo: {
     alignItems: "center",
     justifyContent: "center",
-    marginTop: "10%"
+    marginTop: "10%",
   },
   login: {
     flex: 1,
