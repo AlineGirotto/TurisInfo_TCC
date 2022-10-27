@@ -1,10 +1,11 @@
 import { StyleSheet, StatusBar, View } from "react-native";
 import React from "react";
-import Rotas from "./components/Rotas";
+import { NavigationContainer } from "@react-navigation/native";
+import StackNavigator from "./components/stackNavigator";
 
 export default function App() {
   return (
-      <Rotas />
+      <StackNavigator />
   );
 }
 

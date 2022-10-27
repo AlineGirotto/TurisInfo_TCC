@@ -2,10 +2,19 @@ import { StyleSheet, Text, View } from "react-native";
 import { Card } from "react-native-paper";
 import { React, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 
 export default function Home({ navigation }) {
+
+  useEffect(() => {
+    const logado = auth.onAuthStateChanged(user => {
+      if(user){
+        navigation.navigate("Home")
+      }
+    })
+
+    return logado; 
+  }, [])
 
   return (
     <View style={styles.container}>

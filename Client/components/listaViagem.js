@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   TextInput,
   Platform,
-  Button,
 } from "react-native";
 import { React, useState, useEffect } from "react";
 import SelectDropdown from "react-native-select-dropdown";
@@ -13,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import DatePicker from "react-datepicker";
+import { TextInputMask } from "react-native-masked-text";
 
 export default function ListaViagem({ navigation }) {
   const Turnos = ["Manhã", "Tarde", "Noite", "Não"];
@@ -48,7 +47,7 @@ export default function ListaViagem({ navigation }) {
     })();
   }, []);
 
-  function showDatePicker() {
+  const showDatePicker = () => {
     setDatePicker(true);
     return (
       <View style={styles.container}>
@@ -61,7 +60,7 @@ export default function ListaViagem({ navigation }) {
         />
       </View>
     );
-  }
+  };
 
   function onDateSelected(event, value) {
     if (event?.type === "dismissed") {
@@ -75,11 +74,13 @@ export default function ListaViagem({ navigation }) {
 
   function getData(tela) {
     if (tela) {
-      return <View style={styles.container}>
-        <TouchableOpacity style={styles.btn} onPress={showDatePicker}>
+      return (
+        <View style={styles.container}>
+          <TouchableOpacity style={styles.btn} onPress={showDatePicker}>
             <Text style={styles.textBtn}>Selecionar data</Text>
           </TouchableOpacity>
-      </View>;
+        </View>
+      );
     } else {
       return (
         <View
@@ -89,12 +90,16 @@ export default function ListaViagem({ navigation }) {
             justifyContent: "center",
           }}
         >
-          <TextInput
+          <TextInputMask
             style={styles.input}
             placeholder="Data da viagem"
-            autoCorrect={false}
+            type={"datetime"}
+            options={{
+              format: "DD/MM/YYYY",
+            }}
             value={form.Data}
             onChange={(e) => updateForm({ Data: e.target.value })}
+            keyboardType="numeric"
           />
         </View>
       );

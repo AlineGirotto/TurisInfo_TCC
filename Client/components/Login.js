@@ -16,10 +16,9 @@ export default function Login({ navigation }) {
   const [senha, setSenha] = useState("");
 
   async function login() {
-    await signInWithEmailAndPassword(auth, email, senha).then(value =>{
-      //console.log('Login realizado ');      
-      navigation.navigate("Home");
-    }).catch(error => console.log(error));
+    await signInWithEmailAndPassword(auth, email, senha).then(value =>{  
+      navigation.navigate("TabNavi");
+    }).catch(error => alert("Erro no login"));
   }
 
   return (
@@ -43,7 +42,14 @@ export default function Login({ navigation }) {
             secureTextEntry
             value={senha}
             onChangeText={setSenha}
-          />
+          />          
+          <TouchableOpacity
+            style={styles.btn}
+            title="Entrar"
+            onPress={login}
+          >
+            <Text style={styles.textBtn}>Acessar</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.btn2}
             title="Cadastrar login"
@@ -52,13 +58,6 @@ export default function Login({ navigation }) {
             <Text style={{ color: "#004A85", fontSize: 15 }}>
               Cadastrar-se
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.btn}
-            title="Entrar"
-            onPress={login}
-          >
-            <Text style={styles.textBtn}>Acessar</Text>
           </TouchableOpacity>
         </View>
       </View>
