@@ -13,10 +13,10 @@ export default function efetuarPagamento({ navigation }) {
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const uid = user.uid;
-      } else {
-        navigation.navigate("Home");
+      if (user) {        
+        navigation.navigate("Home")
+      }else{
+        navigation.navigate("Login")
       }
     });
   },[]);

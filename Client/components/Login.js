@@ -36,7 +36,11 @@ export default function Login({ navigation }) {
           }
         });
       })
-      .catch((error) => alert("Erro no login"));
+      .catch((error) => (
+        alert("Erro no login"),
+        setEmail(""),
+        setSenha("")
+      ));
   }
 
   return (

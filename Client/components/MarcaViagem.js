@@ -13,15 +13,17 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { TextInputMask } from "react-native-masked-text";
+import { doc, setDoc, getFirestore } from "firebase/firestore";
 
-export default function ListaViagem({ navigation }) {
+export default function MarcaViagem({ navigation }) {
   const Turnos = ["Manhã", "Tarde", "Noite", "Não"];
   const [tela, setTela] = useState(false);
-  const [datePicker, setDatePicker] = useState(tela);
+  const [datePicker, setDatePicker] = useState(false);
   const [data, setDate] = useState(new Date());
+  const [nome, setNome] = useState("");
   const [form, setForm] = useState({
     Data: "",
-    Nome: "",
+    Nome: nome,
     Ida: "",
     Volta: "",
   });
@@ -35,9 +37,9 @@ export default function ListaViagem({ navigation }) {
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        const uid = user.uid;
-      } else {
         navigation.navigate("Home");
+      } else {
+        navigation.navigate("Login");
       }
     });
 
@@ -47,38 +49,36 @@ export default function ListaViagem({ navigation }) {
     })();
   }, []);
 
-  const showDatePicker = () => {
+  const showDate = () => {
     setDatePicker(true);
-    return (
-      <View style={styles.container}>
-        <DateTimePicker
-          value={data}
-          mode={"date"}
-          display={Platform.OS === "ios" ? "spinner" : "default"}
-          onChange={onDateSelected}
-          style={styles.datePicker}
-        />
-      </View>
-    );
-  };
+  }
 
-  function onDateSelected(event, value) {
+  async function onDateSelected(event, value) {
     if (event?.type === "dismissed") {
-      setDate(date);
+      setDate(data);
       return;
     }
-    setDate(value);
-    updateForm({ Data: value });
-    setDatePicker(false);
+    await setDate(value);
+    await updateForm({ Data: value });
+    await setDatePicker(false);
   }
 
   function getData(tela) {
     if (tela) {
       return (
-        <View style={styles.container}>
-          <TouchableOpacity style={styles.btn} onPress={showDatePicker}>
+        <View>
+          <TouchableOpacity style={styles.btn} onPress={() => showDate()}>
             <Text style={styles.textBtn}>Selecionar data</Text>
           </TouchableOpacity>
+          {datePicker && (
+            <DateTimePicker
+            value={data}
+            mode={"date"}
+            display={Platform.OS === "ios" ? "spinner" : "default"}
+            onChange={onDateSelected}
+            style={styles.datePicker}
+          />
+          )}      
         </View>
       );
     } else {
@@ -108,15 +108,19 @@ export default function ListaViagem({ navigation }) {
 
   async function onSubmit(e) {
     e.preventDefault();
-
-    console.log(form);
-
+    setForm(form.Nome = nome);
+    const db = getFirestore();
+    await setDoc(doc(db, "Viagens", JSON.stringify(data)), {
+     form
+    });
+    
     setForm({
       Data: "",
       Nome: "",
       Ida: "",
       Volta: "",
     });
+    setNome("");
   }
 
   return (
@@ -126,13 +130,12 @@ export default function ListaViagem({ navigation }) {
           Registre o horário de sua viagem
         </Text>
         <View style={styles.container3}>
-          {getData(tela)}
+          {getData(tela)}              
           <TextInput
             style={styles.input}
             placeholder="Nome completo"
-            autoCorrect={false}
-            value={form.Nome}
-            onChange={(e) => updateForm({ Nome: e.target.value })}
+            value={nome}
+            onChangeText={setNome}
           />
           <SelectDropdown
             data={Turnos}

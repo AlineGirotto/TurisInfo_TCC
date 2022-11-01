@@ -12,10 +12,10 @@ import { auth } from "../firebaseConfig";
 export default function ConsultaMensalidade({ navigation }) {  
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const uid = user.uid;
+      if (user) {        
+        navigation.navigate("Home")
       } else {
-        navigation.navigate("Home");
+        navigation.navigate("Login");
       }
     });
   }, []);

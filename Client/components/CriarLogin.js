@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   Logo: {
     alignItems: "center",
     justifyContent: "center",
-    marginTop: "20%"
+    marginTop: "10%"
   },
   login: {
     flex: 1,

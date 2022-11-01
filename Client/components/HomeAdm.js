@@ -10,6 +10,8 @@ export default function HomeAdm({ navigation }) {
     const logado = auth.onAuthStateChanged(user => {
       if(user){
         navigation.navigate("HomeAdm")
+      }else{
+        navigation.navigate("Login")
       }
     })
 

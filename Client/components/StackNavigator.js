@@ -8,7 +8,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import home from "./Home";
 import mensalidade from "./consultamensalidade";
-import viagem from "./listaViagem";
+import viagem from "./MarcaViagem";
 import Login from "./Login";
 import CriarLogin from "./CriarLogin";
 import HomeAdm from "./HomeAdm";
@@ -117,7 +117,11 @@ export default function StackNavigator() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="CriarLogin" component={CriarLogin} />
         <Stack.Screen name="TabNavi" component={TabNavi} />
-        <Stack.Screen name="HomeAdm" component={HomeAdm} />
+        <Stack.Screen name="HomeAdm" component={HomeAdm} options={{
+            headerShown: true,
+            headerTitle: "",
+            headerStyle: { backgroundColor: "#004A85" }
+          }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
