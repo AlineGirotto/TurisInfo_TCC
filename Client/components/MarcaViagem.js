@@ -14,6 +14,7 @@ import { auth } from "../firebaseConfig";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { TextInputMask } from "react-native-masked-text";
 import { doc, setDoc, getFirestore } from "firebase/firestore";
+import { format } from "fecha";
 
 export default function MarcaViagem({ navigation }) {
   const Turnos = ["Manhã", "Tarde", "Noite", "Não"];
@@ -51,15 +52,16 @@ export default function MarcaViagem({ navigation }) {
 
   const showDate = () => {
     setDatePicker(true);
-  }
+  };
 
   async function onDateSelected(event, value) {
     if (event?.type === "dismissed") {
       setDate(data);
       return;
     }
+    let dt = format(value, "DD.MM.YYYY");
     await setDate(value);
-    await updateForm({ Data: value });
+    await updateForm({ Data: dt });
     await setDatePicker(false);
   }
 
@@ -72,13 +74,14 @@ export default function MarcaViagem({ navigation }) {
           </TouchableOpacity>
           {datePicker && (
             <DateTimePicker
-            value={data}
-            mode={"date"}
-            display={Platform.OS === "ios" ? "spinner" : "default"}
-            onChange={onDateSelected}
-            style={styles.datePicker}
-          />
-          )}      
+              value={data}
+              minimumDate={new Date()}
+              mode={"date"}
+              display={Platform.OS === "ios" ? "spinner" : "default"}
+              onChange={onDateSelected}
+              style={styles.datePicker}
+            />
+          )}
         </View>
       );
     } else {
@@ -93,27 +96,30 @@ export default function MarcaViagem({ navigation }) {
           <TextInputMask
             style={styles.input}
             placeholder="Data da viagem"
-            type={"datetime"}
-            options={{
-              format: "DD/MM/YYYY",
+            type={"custom"}
+            options={{     
+              mask: "99.99.9999",
             }}
             value={form.Data}
             onChange={(e) => updateForm({ Data: e.target.value })}
             keyboardType="numeric"
           />
         </View>
-      );
+      );      
     }
   }
 
   async function onSubmit(e) {
     e.preventDefault();
-    setForm(form.Nome = nome);
+    setForm((form.Nome = nome));
     const db = getFirestore();
-    await setDoc(doc(db, "Viagens", JSON.stringify(data)), {
-     form
+    await setDoc(doc(db, "Viagens", JSON.stringfy(form.Data)), {
+      Data: form.Data,
+      Nome: form.Nome,
+      Ida: form.Ida,
+      Volta: form.Volta,
     });
-    
+    alert("Cadastro de viagem realizado!");
     setForm({
       Data: "",
       Nome: "",
@@ -130,7 +136,7 @@ export default function MarcaViagem({ navigation }) {
           Registre o horário de sua viagem
         </Text>
         <View style={styles.container3}>
-          {getData(tela)}              
+          {getData(tela)}
           <TextInput
             style={styles.input}
             placeholder="Nome completo"
