@@ -1,16 +1,9 @@
-import { StyleSheet, StatusBar, View } from "react-native";
 import React from "react";
-import StackNavigator from "./components/StackNavigator";
+import Navigator from "./src/routes/Navigator";
 
 export default function App() {
   return (
-      <StackNavigator />
+      <Navigator />
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: StatusBar.currentHeight,
-  },
-});

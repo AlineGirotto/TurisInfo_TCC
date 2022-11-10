@@ -12,8 +12,10 @@
     "@expo/webpack-config": "^0.17.0",
     "@react-native-async-storage/async-storage": "^1.17.10",
     "@react-native-community/datetimepicker": "^6.2.0",
+    "@react-native-community/masked-view": "^0.1.11",
     "@react-native-masked-view/masked-view": "0.2.7",
     "@react-navigation/bottom-tabs": "^6.4.0",
+    "@react-navigation/drawer": "^6.5.0",
     "@react-navigation/native": "^6.0.13",
     "@react-navigation/native-stack": "^6.9.0",
     "@react-navigation/stack": "^6.3.2",
@@ -31,16 +33,22 @@
     "react-native-masked-text": "^1.13.0",
     "react-native-paper": "^5.0.0-rc.6",
     "react-native-reanimated": "~2.9.1",
-    "react-native-safe-area-context": "4.3.1",
+    "react-native-responsive-fontsize": "^0.5.1",
+    "react-native-safe-area-context": "^4.3.1",
     "react-native-screens": "~3.15.0",
     "react-native-select-dropdown": "^2.0.4",
     "react-native-vector-icons": "^9.2.0",
     "react-native-web": "^0.18.9",
+    "react-native-webview": "^11.23.0",
     "react-navigation-stack": "^2.10.4",
     "react-navigation-tabs": "^2.11.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
   },
-  "private": true
+  "private": true,
+  "preset": "react-native",
+  "setupFiles": [
+    "<rootDir>/jest/setup.js"
+  ]
 }
