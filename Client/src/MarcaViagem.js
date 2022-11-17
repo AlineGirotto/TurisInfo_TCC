@@ -95,9 +95,12 @@ export default function MarcaViagem({ navigation }) {
             justifyContent: "center",
           }}
         >
+           <Text style={estilo.txtForm}>
+          Data da viagem
+        </Text>
           <TextInputMask
             style={estilo.input}
-            placeholder="Data da viagem"
+            placeholder="DD.MM.YYYY"
             type={"custom"}
             options={{
               mask: "99.99.9999",
@@ -105,6 +108,7 @@ export default function MarcaViagem({ navigation }) {
             value={form.Data}
             onChange={(e) => updateForm({ Data: e.target.value })}
             keyboardType="numeric"
+            maxLength={10}
           />
         </View>
       );
@@ -140,19 +144,25 @@ export default function MarcaViagem({ navigation }) {
         </Text>
         <View style={estilo.container3}>
           {getData(tela)}
+          <Text style={estilo.txtForm}>
+          Nome completo
+        </Text>
           <TextInput
             style={estilo.input}
-            placeholder="Nome completo"
+            placeholder="Nome Sobrenome"
             value={nome}
             onChangeText={setNome}
           />
+           <Text style={estilo.txtForm}>
+          Selecione o turno de ida
+        </Text>
           <SelectDropdown
             data={Turnos}
             value={form.Ida}
             onSelect={(selectedItem, index) => {
               updateForm({ Ida: selectedItem });
             }}
-            defaultButtonText={"Turno de ida"}
+            defaultButtonText={"Ida"}
             buttonTextAfterSelection={(selectedItem, index) => {
               return selectedItem;
             }}
@@ -172,13 +182,16 @@ export default function MarcaViagem({ navigation }) {
             dropdownStyle={estilo.DropdownStyle}
             buttonStyle={estilo.drop}
           />
+          <Text style={estilo.txtForm}>
+          Selecione o turno de retorno
+        </Text>
           <SelectDropdown
             data={Turnos}
             value={form.Ida}
             onSelect={(selectedItem, index) => {
               updateForm({ Volta: selectedItem });
             }}
-            defaultButtonText={"Turno de volta"}
+            defaultButtonText={"Retorno"}
             buttonTextAfterSelection={(selectedItem, index) => {
               return selectedItem;
             }}

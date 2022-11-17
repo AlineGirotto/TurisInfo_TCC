@@ -1,5 +1,5 @@
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
-import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { React, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -14,8 +14,11 @@ import Login from "../Login";
 import CriarLogin from "../CriarLogin";
 import HomeAdm from "../HomeAdm";
 import Usuarios from "../Usuarios";
+import CadVeiculo from "../CadVeiculo";
+import ListVeiculos from "../ListVeiculos";
+import Pagamento from "../pagamentos";
 import CadPassageiro from "../CadPassageiro";
-import Pagamento from "../Pagamentos";
+import ListPassageiro from "../ListPassageiro";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -151,6 +154,7 @@ function DraNavi() {
       screenOptions={{
         drawerStyle: {
           backgroundColor: "#004A85",
+          color: "ffffff",
         },
       }}
     >
@@ -177,10 +181,10 @@ function DraNavi() {
         }}
       />
       <Drawer.Screen
-        name="Passageiros"
-        component={CadPassageiro}
+        name="Passageiro"
+        component={ListPassageiro}
         options={{
-          title: "Cadastro de passageiros",
+          title: "Passageiros",
           headerTitleStyle: { color: "#ffffff" },
           headerStyle: { backgroundColor: "#004A85" },
           headerRight: () => (
@@ -194,6 +198,58 @@ function DraNavi() {
           },
           drawerIcon: () => (
             <Ionicons name="person" size={25} color={"#ffffff"} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="CadPassageiro"
+        component={CadPassageiro}
+        options={{
+          title: "Cadastro de passageiros",
+          headerTitleStyle: { color: "#ffffff" },
+          headerStyle: { backgroundColor: "#004A85" },
+          headerRight: () => (
+            <TouchableOpacity style={{ margin: 10 }} onPress={() => logout()}>
+              <Ionicons name="exit-outline" size={30} color={"white"} />
+            </TouchableOpacity>
+          ),
+          drawerLabelStyle: {
+            fontSize: RFPercentage(1.5),
+            color: "white",
+          },
+          drawerIcon: () => (
+            <Ionicons
+              name="person-add-outline"
+              size={25}
+              color={"#ffffff"}
+              style={{ marginLeft: "10%" }}
+            />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="ListPassageiro"
+        component={ListPassageiro}
+        options={{
+          title: "Lista de passageiros",
+          headerTitleStyle: { color: "#ffffff" },
+          headerStyle: { backgroundColor: "#004A85" },
+          headerRight: () => (
+            <TouchableOpacity style={{ margin: 10 }} onPress={() => logout()}>
+              <Ionicons name="exit-outline" size={30} color={"white"} />
+            </TouchableOpacity>
+          ),
+          drawerLabelStyle: {
+            fontSize: RFPercentage(1.5),
+            color: "white",
+          },
+          drawerIcon: () => (
+            <Ionicons
+              name="people-outline"
+              size={25}
+              color={"#ffffff"}
+              style={{ marginLeft: "10%" }}
+            />
           ),
         }}
       />
@@ -219,6 +275,46 @@ function DraNavi() {
               size={25}
               color={"#ffffff"}
             />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="CadVeiculo"
+        component={CadVeiculo}
+        options={{
+          title: "Cadastro de veiculos",
+          headerTitleStyle: { color: "#ffffff" },
+          headerStyle: { backgroundColor: "#004A85" },
+          headerRight: () => (
+            <TouchableOpacity style={{ margin: 10 }} onPress={() => logout()}>
+              <Ionicons name="exit-outline" size={30} color={"white"} />
+            </TouchableOpacity>
+          ),
+          drawerLabelStyle: {
+            fontSize: RFPercentage(1.8),
+            color: "white",
+          },
+          drawerIcon: () => <Ionicons name="bus" size={25} color={"#ffffff"} />,
+        }}
+      />
+      <Drawer.Screen
+        name="ListVeiculos"
+        component={ListVeiculos}
+        options={{
+          title: "Lista de veiculos",
+          headerTitleStyle: { color: "#ffffff" },
+          headerStyle: { backgroundColor: "#004A85" },
+          headerRight: () => (
+            <TouchableOpacity style={{ margin: 10 }} onPress={() => logout()}>
+              <Ionicons name="exit-outline" size={30} color={"white"} />
+            </TouchableOpacity>
+          ),
+          drawerLabelStyle: {
+            fontSize: RFPercentage(1.8),
+            color: "white",
+          },
+          drawerIcon: () => (
+            <Ionicons name="list-outline" size={25} color={"#ffffff"} />
           ),
         }}
       />

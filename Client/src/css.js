@@ -69,6 +69,25 @@ export default StyleSheet.create({
     width: "90%",
     marginBottom: 15,
     color: "#000000",
+    fontSize: RFPercentage(1.8),
+    borderRadius: 10,
+    borderWidth: 0.5,
+    padding: 10,
+    borderColor: "#004A85",
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.58,
+    shadowRadius: 5,
+    elevation: 10,
+  },
+  inputF: {
+    backgroundColor: "#F5F5F5",
+    width: "50%",
+    marginBottom: 15,
+    color: "#000000",
     fontSize: RFPercentage(2),
     borderRadius: 10,
     borderWidth: 0.5,
@@ -85,7 +104,7 @@ export default StyleSheet.create({
   },
   DropdownStyle: {
     backgroundColor: "#ffffff",
-    height: 125,
+    height: "auto",
     color: "#000000",
     fontSize: 17,
     borderRadius: 10,
@@ -94,7 +113,8 @@ export default StyleSheet.create({
   },
   drop: {
     backgroundColor: "#F5F5F5",
-    width: "80%",
+    width: "90%",
+    height: "auto",
     marginBottom: 15,
     color: "#000000",
     fontSize: 17,
@@ -155,16 +175,43 @@ export default StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  btnF: {
+    backgroundColor: "#004A85",
+    width: "auto",
+    height: 45,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+    marginLeft: "1%"
+  },
   txt: {
     fontSize: RFPercentage(2),
     textAlign: "center",
     alignSelf: "center",
+  },
+  txt2: {
+    fontSize: RFPercentage(2),
+    alignSelf: "flex-start",
+    marginLeft: "5%",
+  },
+  txtFlat: {
+    fontSize: RFPercentage(2),
+    textAlign: "center",
+    alignSelf: "center",
+    fontWeight: "bold"
+  },
+  txtForm: {
+    fontSize: RFPercentage(1.5),
+    alignSelf: "flex-start",
+    marginLeft: "5%",
+    fontStyle: "italic"
   },
   info: {
     fontSize: RFPercentage(2),
     textAlign: "center",
     alignSelf: "center",
     marginLeft: "1%",
+    fontStyle: "italic"
   },
   textBtn: {
     color: "#ffffff",
@@ -185,12 +232,14 @@ export default StyleSheet.create({
     alignSelf: "flex-start",
     width: "100%",
     paddingTop: 5,
+    paddingLeft: 1
   },
   cardAct: {
     alignSelf: "flex-end",
     justifyContent: "center",
     borderRadius: 10,
     backgroundColor: "#004A85",
+    marginTop: 5
   },
   btncard: {
     alignItems: "center",
