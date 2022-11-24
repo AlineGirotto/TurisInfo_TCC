@@ -3,7 +3,7 @@ import {
   Text,
   TouchableOpacity,
   Linking,
-  Platform
+  Platform,
 } from "react-native";
 import { React, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -11,11 +11,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import {
   createDrawerNavigator,
-  DrawerContentScrollView,
-  DrawerItemList,
-  DrawerItem,
 } from "@react-navigation/drawer";
-import estilo from "../css";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { getAuth, signOut } from "firebase/auth";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -26,11 +22,10 @@ import Login from "../Login";
 import CriarLogin from "../CriarLogin";
 import HomeAdm from "../HomeAdm";
 import Usuarios from "../Usuarios";
-import CadVeiculo from "../CadVeiculo";
 import ListVeiculos from "../ListVeiculos";
 import Pagamento from "../pagamentos";
-import CadPassageiro from "../CadPassageiro";
 import ListPassageiro from "../ListPassageiro";
+import Instituicao from "../Instituicao";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -47,7 +42,7 @@ function logout() {
     });
 }
 
-function TabNavi() {  
+function TabNavi() {
   const [tela, setTela] = useState(false);
 
   const WhatsApp = () => {
@@ -56,11 +51,11 @@ function TabNavi() {
       default: () => setTela(false),
     })();
 
-    if(tela){
+    if (tela) {
       Linking.openURL(
         `whatsapp://send?text=Olá, preciso retirar uma dúvida!&phone=55054992122396`
       );
-    }else{
+    } else {
       Linking.openURL(
         `https://api.whatsapp.com/send/?phone=55054992122396&text=Ol%C3%A1+estou+com+d%C3%BAvida!`
       );
@@ -183,56 +178,6 @@ function TabNavi() {
 }
 
 function DraNavi() {
-  const [pass, setPass] = useState(false);
-  const [vei, setVei] = useState(false);
-
-  function CustomDrawerContent(props) {
-    return (
-      <DrawerContentScrollView {...props}>
-        <DrawerItemList {...props} />
-        <DrawerItem
-          label={() => (
-            <Text style={{ color: "#ffffff", fontSize: RFPercentage(1.8) }}>
-              Passageiros
-            </Text>
-          )}
-          onPress={() => setPass(!pass)}
-          icon={() => (
-            <Ionicons name="people-outline" size={25} color={"#ffffff"} />
-          )}
-        />
-        {pass && (
-          <DrawerItem
-            style={{ marginLeft: "10%" }}
-            label={() => (
-              <Text style={{ color: "#ffffff", fontSize: RFPercentage(1.5) }}>
-                Cadastro de passageiro
-              </Text>
-            )}
-            //onPress={() => props.navigation.navigate("CadPassageiro")}
-            icon={() => (
-              <Ionicons name="person-add-outline" size={25} color={"#ffffff"} />
-            )}
-          />
-        )}
-        {pass && (
-          <DrawerItem
-            style={{ marginLeft: "10%" }}
-            label={() => (
-              <Text style={{ color: "#ffffff", fontSize: RFPercentage(1.5) }}>
-                Lista de passageiros
-              </Text>
-            )}
-            //onPress={() => navigation.navigate("ListPassageiro")}
-            icon={() => (
-              <Ionicons name="person-outline" size={25} color={"#ffffff"} />
-            )}
-          />
-        )}
-      </DrawerContentScrollView>
-    );
-  }
-
   return (
     <Drawer.Navigator
       useLegacyImplementation
@@ -243,7 +188,6 @@ function DraNavi() {
           color: "ffffff",
         },
       }}
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
       <Drawer.Screen
         name="Home Administrador"
@@ -293,29 +237,10 @@ function DraNavi() {
         }}
       />
       <Drawer.Screen
-        name="CadVeiculo"
-        component={CadVeiculo}
-        options={{
-          title: "Cadastro de veiculos",
-          headerTitleStyle: { color: "#ffffff" },
-          headerStyle: { backgroundColor: "#004A85" },
-          headerRight: () => (
-            <TouchableOpacity style={{ margin: 10 }} onPress={() => logout()}>
-              <Ionicons name="exit-outline" size={30} color={"white"} />
-            </TouchableOpacity>
-          ),
-          drawerLabelStyle: {
-            fontSize: RFPercentage(1.8),
-            color: "white",
-          },
-          drawerIcon: () => <Ionicons name="bus" size={25} color={"#ffffff"} />,
-        }}
-      />
-      <Drawer.Screen
         name="ListVeiculos"
         component={ListVeiculos}
         options={{
-          title: "Lista de veiculos",
+          title: "Veículos",
           headerTitleStyle: { color: "#ffffff" },
           headerStyle: { backgroundColor: "#004A85" },
           headerRight: () => (
@@ -328,7 +253,28 @@ function DraNavi() {
             color: "white",
           },
           drawerIcon: () => (
-            <Ionicons name="list-outline" size={25} color={"#ffffff"} />
+            <Ionicons name="bus" size={25} color={"#ffffff"} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Instituicao"
+        component={Instituicao}
+        options={{
+          title: "Instituições Cadastradas",
+          headerTitleStyle: { color: "#ffffff" },
+          headerStyle: { backgroundColor: "#004A85" },
+          headerRight: () => (
+            <TouchableOpacity style={{ margin: 10 }} onPress={() => logout()}>
+              <Ionicons name="exit-outline" size={30} color={"white"} />
+            </TouchableOpacity>
+          ),
+          drawerLabelStyle: {
+            fontSize: RFPercentage(1.8),
+            color: "white",
+          },
+          drawerIcon: () => (
+            <Ionicons name="school-outline" size={25} color={"#ffffff"} />
           ),
         }}
       />
@@ -349,7 +295,6 @@ export default function StackNavigator() {
         <Stack.Screen name="CriarLogin" component={CriarLogin} />
         <Stack.Screen name="TabNavi" component={TabNavi} />
         <Stack.Screen name="DraNavi" component={DraNavi} />
-        <Stack.Screen name="ListPassageiro" component={ListPassageiro} />
       </Stack.Navigator>
     </NavigationContainer>
   );

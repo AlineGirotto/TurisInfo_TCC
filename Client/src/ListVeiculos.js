@@ -29,9 +29,10 @@ export default function ListVeiculos({ navigation }) {
   const Regular = ["Regularizado", "Pendente"];
   const [veiculo, setVeiculo] = useState([]);
   const [filtro, setFiltro] = useState("");
+  const [submit, setSubmit] = useState("");
   const [nome, setNome] = useState("");
   const [visible, setModalVisible] = useState(false);
-  const [modalData, setModalData] = useState({
+  const [form, setForm] = useState({
     Modelo: "",
     Consumo: "",
     Capacidade: "",
@@ -40,16 +41,15 @@ export default function ListVeiculos({ navigation }) {
     Regularizacao: "",
   });
 
-  
-  useEffect(() => {
-    veiculos();
-  }, []);
-
   function updateForm(value) {
-    return setModalData((prev) => {
+    return setForm((prev) => {
       return { ...prev, ...value };
     });
   }
+
+  useEffect(() => {
+    veiculos();
+  }, []);
 
   async function veiculos() {
     const db = getFirestore();
@@ -70,7 +70,7 @@ export default function ListVeiculos({ navigation }) {
     setVeiculo(a);
   }
 
-  const excluirUsu = async (Modelo) => {
+  const excluir = async (Modelo) => {
     const db = getFirestore();
     const q = query(collection(db, "Veiculos"), where("Modelo", "==", Modelo));
     const querySnapshot = await getDocs(q);
@@ -83,10 +83,11 @@ export default function ListVeiculos({ navigation }) {
     alert("Veículo excluído!");
   };
 
-  const editUsu = async (item) => {
-  setNome(item.Modelo);
-   setModalVisible(!visible);
-   setModalData({
+  const edit = async (item) => {
+    setSubmit("edit");
+    setNome(item.Modelo);
+    setModalVisible(!visible);
+    setForm({
       Modelo: item.Modelo,
       Consumo: item.Consumo,
       Capacidade: item.Capacidade,
@@ -94,6 +95,11 @@ export default function ListVeiculos({ navigation }) {
       Status: item.Status,
       Regularizacao: item.Regularizacao,
     });
+  };
+
+  const add = async () => {
+    setSubmit("add");
+    setModalVisible(!visible);
   };
 
   const renderItem = ({ item }) => {
@@ -135,123 +141,17 @@ export default function ListVeiculos({ navigation }) {
             </View>
           </Card.Content>
           <Card.Actions style={estilo.cardAct}>
-            <Pressable
-              style={estilo.btncard}
-              onPress={() => editUsu(item)}
-            >
-              <Text style={estilo.textBtn2}>Editar</Text>
+            <Pressable style={estilo.btncard} onPress={() => edit(item)}>
+              <Ionicons name="pencil-outline" size={25} color={"white"} />
             </Pressable>
             <Pressable
               style={estilo.btncard}
-              onPress={() => excluirUsu(item.Modelo)}
+              onPress={() => excluir(item.Modelo)}
             >
-              <Text style={estilo.textBtn2}>Excluir</Text>
+              <Ionicons name="trash-outline" size={25} color={"white"} />
             </Pressable>
           </Card.Actions>
         </Card>
-      </View>
-    );
-  };
-
-  const ModalItem = () => {
-    return (
-      <View style={estilo.modal}>
-        <Text style={estilo.titulo}>Editar veículo</Text>
-        <TextInput
-          style={estilo.input}
-          placeholder={modalData.Modelo}
-          value={modalData.Modelo}
-          onChangeText={(e) => updateForm({ Modelo: e })}
-        />
-        <Text style={estilo.txtForm}>Consumo</Text>
-        <TextInput
-          style={estilo.input}
-          placeholder={modalData.Consumo}
-          keyboardType="numeric"
-          value={modalData.Consumo}
-          onChangeText={(e) => updateForm({ Consumo: e })}
-        />
-        <Text style={estilo.txtForm}>Capacidade</Text>
-        <TextInput
-          style={estilo.input}
-          placeholder={modalData.Capacidade}
-          value={modalData.Capacidade}
-          onChangeText={(e) => updateForm({ Capacidade: e })}
-          keyboardType="numeric"
-          maxLength={3}
-        />
-        <Text style={estilo.txtForm}>Data de fabricação</Text>
-        <TextInputMask
-          style={estilo.input}
-          placeholder="DD.MM.AAAA"
-          type={"custom"}
-          options={{
-            mask: "99.99.9999",
-          }}
-          value={modalData.Fabricacao}
-          onChange={(e) => updateForm({ Fabricacao: e.target.value })}
-          keyboardType="numeric"
-          maxLength={10}
-        />
-        <Text style={estilo.txtForm}>Status</Text>
-        <SelectDropdown
-            data={Status}
-            onSelect={(selectedItem, index) => {
-              updateForm({ Status: selectedItem });
-            }}
-            defaultButtonText={"Status"}
-            buttonTextAfterSelection={(selectedItem, index) => {
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, index) => {
-              return item;
-            }}
-            renderDropdownIcon={(isOpened) => {
-              return (
-                <Ionicons
-                  name={isOpened ? "chevron-up" : "chevron-down"}
-                  color={"#444"}
-                  size={18}
-                />
-              );
-            }}
-            dropdownIconPosition={"right"}
-            dropdownStyle={estilo.DropdownStyle}
-            buttonStyle={estilo.drop}
-          />
-          <Text style={estilo.txtForm}>Regularização</Text>
-          <SelectDropdown
-            data={Regular}
-            onSelect={(selectedItem, index) => {
-              updateForm({ Regularizacao: selectedItem });
-            }}
-            defaultButtonText={"Regularização"}
-            buttonTextAfterSelection={(selectedItem, index) => {
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, index) => {
-              return item;
-            }}
-            renderDropdownIcon={(isOpened) => {
-              return (
-                <Ionicons
-                  name={isOpened ? "chevron-up" : "chevron-down"}
-                  color={"#444"}
-                  size={18}
-                />
-              );
-            }}
-            dropdownIconPosition={"right"}
-            dropdownStyle={estilo.DropdownStyle}
-            buttonStyle={estilo.drop}
-          />
-
-        <TouchableOpacity
-          style={estilo.btn}
-          onPress={onSubmit}
-        >
-          <Text style={estilo.textBtn}>Salvar</Text>
-        </TouchableOpacity>
       </View>
     );
   };
@@ -264,19 +164,32 @@ export default function ListVeiculos({ navigation }) {
   }
 
   async function onSubmit() {
-    const db = getFirestore();
-    await deleteDoc(doc(db, "Veiculos", nome));
-    await setDoc(doc(db, "Veiculos", modalData.Modelo), {
-      Modelo: modalData.Modelo,
-      Consumo: modalData.Consumo,
-      Capacidade: modalData.Capacidade,
-      Fabricacao: modalData.Fabricacao,
-      Status: modalData.Status,
-      Regularizacao: modalData.Regularizacao,
-    });
+    if (submit == "edit") {
+      const db = getFirestore();
+      await deleteDoc(doc(db, "Veiculos", nome));
+      await setDoc(doc(db, "Veiculos", form.Modelo), {
+        Modelo: form.Modelo,
+        Consumo: form.Consumo,
+        Capacidade: form.Capacidade,
+        Fabricacao: form.Fabricacao,
+        Status: form.Status,
+        Regularizacao: form.Regularizacao,
+      });
+      alert("Edição realizada!");
+    } else if (submit == "add") {
+      const db = getFirestore();
+      await setDoc(doc(db, "Veiculos", form.Modelo), {
+        Modelo: form.Modelo,
+        Consumo: form.Consumo,
+        Capacidade: form.Capacidade,
+        Fabricacao: form.Fabricacao,
+        Status: form.Status,
+        Regularizacao: form.Regularizacao,
+      });
+      alert("Cadastro realizado!");
+    }
     setModalVisible(!visible);
-    alert("Cadastro realizado!");
-    setModalData({
+    setForm({
       Modelo: "",
       Consumo: "",
       Capacidade: "",
@@ -290,15 +203,33 @@ export default function ListVeiculos({ navigation }) {
   return (
     <View style={estilo.background}>
       <View style={estilo.container}>
-        <Text style={estilo.titulo}>Veículos cadastrados:</Text>
+        <Text style={estilo.titulo2}>Veículos cadastrados:</Text>
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "flex-end",
-            alignSelf: "flex-end",
-            marginRight: "5%",
+            justifyContent: "center",
+            flexWrap: "wrap",
+            width: "90%",
           }}
         >
+          <TouchableOpacity
+            style={{
+              flexDirection: "row",
+              backgroundColor: "#004A85",
+              width: "auto",
+              height: 45,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 10,
+              padding: 2,
+              marginRight: '10%'
+            }}
+            onPress={() => add()}
+          >
+            <Ionicons name="add-outline" size={15} color={"white"} />
+            <Text style={estilo.textBtn2}>Adicionar veículo</Text>
+          </TouchableOpacity>
+
           <TextInput
             style={estilo.inputF}
             placeholder="Filtro"
@@ -308,16 +239,17 @@ export default function ListVeiculos({ navigation }) {
           <TouchableOpacity
             style={{
               backgroundColor: "#004A85",
-              width: "20%",
+              width: "auto",
               height: 45,
               alignItems: "center",
               justifyContent: "center",
               borderRadius: 10,
-              marginLeft: "2%",
+              marginLeft: '0.5%',
+              padding:'1%'
             }}
             onPress={() => filtrado()}
           >
-            <Text style={estilo.textBtn2}>Filtar</Text>
+            <Ionicons name="search-outline" size={25} color={"white"}/>
           </TouchableOpacity>
           <TouchableOpacity
             style={{
@@ -327,7 +259,7 @@ export default function ListVeiculos({ navigation }) {
               alignItems: "center",
               justifyContent: "center",
               borderRadius: 10,
-              marginLeft: "2%",
+              marginLeft: '1.5%'
             }}
             onPress={() => veiculos()}
           >
@@ -348,7 +280,110 @@ export default function ListVeiculos({ navigation }) {
             setModalVisible(!visible);
           }}
         >
-          <ModalItem />
+          <View style={estilo.modal}>
+            <Ionicons
+              name="close-circle-outline"
+              size={25}
+              color={"black"}
+              onPress={() => {
+                setModalVisible(!visible);
+              }}
+              style={{ alignSelf: "flex-end" }}
+            />
+            <Text style={estilo.titulo2}>Editar veículo</Text>
+            <TextInput
+              style={estilo.input}
+              placeholder="digite"
+              value={form.Modelo}
+              onChangeText={(e) => updateForm({ Modelo: e })}
+            />
+            <Text style={estilo.txtForm}>Consumo</Text>
+            <TextInput
+              style={estilo.input}
+              placeholder="digite"
+              keyboardType="numeric"
+              value={form.Consumo}
+              onChange={(e) => updateForm({ Consumo: e.target.value })}
+            />
+            <Text style={estilo.txtForm}>Capacidade</Text>
+            <TextInput
+              style={estilo.input}
+              placeholder="digite"
+              value={form.Capacidade}
+              onChange={(e) => updateForm({ Capacidade: e.target.value })}
+              keyboardType="numeric"
+              maxLength={3}
+            />
+            <Text style={estilo.txtForm}>Data de fabricação</Text>
+            <TextInputMask
+              style={estilo.input}
+              placeholder="DD.MM.AAAA"
+              type={"custom"}
+              options={{
+                mask: "99.99.9999",
+              }}
+              value={form.Fabricacao}
+              onChange={(e) => updateForm({ Fabricacao: e.target.value })}
+              keyboardType="numeric"
+              maxLength={10}
+            />
+            <Text style={estilo.txtForm}>Status</Text>
+            <SelectDropdown
+              data={Status}
+              onSelect={(selectedItem, index) => {
+                updateForm({ Status: selectedItem });
+              }}
+              defaultButtonText={"Status"}
+              buttonTextAfterSelection={(selectedItem, index) => {
+                return selectedItem;
+              }}
+              rowTextForSelection={(item, index) => {
+                return item;
+              }}
+              renderDropdownIcon={(isOpened) => {
+                return (
+                  <Ionicons
+                    name={isOpened ? "chevron-up" : "chevron-down"}
+                    color={"#444"}
+                    size={18}
+                  />
+                );
+              }}
+              dropdownIconPosition={"right"}
+              dropdownStyle={estilo.DropdownStyle}
+              buttonStyle={estilo.drop}
+            />
+            <Text style={estilo.txtForm}>Regularização</Text>
+            <SelectDropdown
+              data={Regular}
+              onSelect={(selectedItem, index) => {
+                updateForm({ Regularizacao: selectedItem });
+              }}
+              defaultButtonText={"Regularização"}
+              buttonTextAfterSelection={(selectedItem, index) => {
+                return selectedItem;
+              }}
+              rowTextForSelection={(item, index) => {
+                return item;
+              }}
+              renderDropdownIcon={(isOpened) => {
+                return (
+                  <Ionicons
+                    name={isOpened ? "chevron-up" : "chevron-down"}
+                    color={"#444"}
+                    size={18}
+                  />
+                );
+              }}
+              dropdownIconPosition={"right"}
+              dropdownStyle={estilo.DropdownStyle}
+              buttonStyle={estilo.drop}
+            />
+
+            <TouchableOpacity style={estilo.btn} onPress={onSubmit}>
+              <Text style={estilo.textBtn}>Salvar</Text>
+            </TouchableOpacity>
+          </View>
         </Modal>
       </View>
     </View>

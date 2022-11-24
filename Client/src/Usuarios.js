@@ -35,12 +35,12 @@ export default function Usuarios({ navigation }) {
     const querySnapshot = await getDocs(q);
     let a = [];
     querySnapshot.forEach((doc) => {
-      const user = {
+      const x = {
         id: doc.id,
         usuario: doc.data().Usuario,
         adm: doc.data().Adm,
       };
-      a.push(user);
+      a.push(x);
     });
     setUsuario(a);
   }

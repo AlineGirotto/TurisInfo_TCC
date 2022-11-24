@@ -54,6 +54,13 @@ export default StyleSheet.create({
     textAlign: "center",
     fontSize: RFPercentage(2.3),
   },
+  titulo2: { 
+    padding: 10,
+    fontWeight: "bold", 
+    textAlign: "center",
+    fontSize: RFPercentage(2.3),
+    marginBottom: "3%"
+  },
   Logo: {
     alignItems: "center",
     justifyContent: "center",
@@ -85,7 +92,7 @@ export default StyleSheet.create({
   },
   inputF: {
     backgroundColor: "#F5F5F5",
-    width: "50%",
+    width: "40%",
     marginBottom: 15,
     color: "#000000",
     fontSize: RFPercentage(1.5),
@@ -244,8 +251,7 @@ export default StyleSheet.create({
   btncard: {
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 32,
+    padding: 20,
     borderRadius: 4,
     elevation: 3,
   },
@@ -262,9 +268,9 @@ export default StyleSheet.create({
   },
   modal:{
     alignItems: "center",
-    margin: "auto",
+    margin: "10%",
     padding: "2%",
-    backgroundColor: "#c8f1ff",
+    backgroundColor: "#b5b5b5",
     borderRadius: 15,
     borderWidth: 2,
     borderColor: "#004A85",
