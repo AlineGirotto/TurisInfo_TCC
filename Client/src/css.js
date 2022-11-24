@@ -6,14 +6,14 @@ export default StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#DFDFDF",
+    backgroundColor: "#ffffff",
   },
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#c8f1ff",
-    width: "90%",
+    backgroundColor: "#b5b5b5",
+    width: "95%",
     borderRadius: 15,
     borderWidth: 2,
     borderColor: "#004A85",
@@ -32,7 +32,7 @@ export default StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#DFDFDF",
+    backgroundColor: "#ffffff",
     width: "95%",
     borderRadius: 15,
     borderWidth: 2,
@@ -49,10 +49,10 @@ export default StyleSheet.create({
     elevation: 24,
   },
   titulo: { 
-    padding: 10, 
+    padding: 10,
     fontWeight: "bold", 
     textAlign: "center",
-    fontSize: RFPercentage(3),
+    fontSize: RFPercentage(2.3),
   },
   Logo: {
     alignItems: "center",
@@ -69,7 +69,7 @@ export default StyleSheet.create({
     width: "90%",
     marginBottom: 15,
     color: "#000000",
-    fontSize: RFPercentage(1.8),
+    fontSize: RFPercentage(1.5),
     borderRadius: 10,
     borderWidth: 0.5,
     padding: 10,
@@ -88,7 +88,7 @@ export default StyleSheet.create({
     width: "50%",
     marginBottom: 15,
     color: "#000000",
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(1.5),
     borderRadius: 10,
     borderWidth: 0.5,
     padding: 10,
@@ -142,7 +142,7 @@ export default StyleSheet.create({
     backgroundColor: "#ffffff",
     alignItems: "center",
     padding: 10,
-    maxWidth: "30%",
+    width: "35%",
     maxHeight: 150,
     borderRadius: 20,
     shadowColor: "#000",
@@ -159,7 +159,7 @@ export default StyleSheet.create({
   },
   icon: {
     textAlign: "center",
-    padding: "20%",
+    paddingTop: "15%",
   },
   btn: {
     backgroundColor: "#004A85",
@@ -185,29 +185,29 @@ export default StyleSheet.create({
     marginLeft: "1%"
   },
   txt: {
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(1.5),
     textAlign: "center",
     alignSelf: "center",
   },
   txt2: {
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(1.5),
     alignSelf: "flex-start",
     marginLeft: "5%",
   },
   txtFlat: {
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(1.5),
     textAlign: "center",
     alignSelf: "center",
     fontWeight: "bold"
   },
   txtForm: {
-    fontSize: RFPercentage(1.5),
+    fontSize: RFPercentage(1.8),
     alignSelf: "flex-start",
     marginLeft: "5%",
     fontStyle: "italic"
   },
   info: {
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(1.5),
     textAlign: "center",
     alignSelf: "center",
     marginLeft: "1%",
@@ -216,11 +216,11 @@ export default StyleSheet.create({
   textBtn: {
     color: "#ffffff",
     textAlign: "center",
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(1.5),
   },
   textBtn2: {
     color: "#ffffff",
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(1.5),
     padding: 5,
   },
   linha: {
@@ -260,4 +260,23 @@ export default StyleSheet.create({
   flatList: {
     width: "90%",
   },
+  modal:{
+    alignItems: "center",
+    margin: "auto",
+    padding: "2%",
+    backgroundColor: "#c8f1ff",
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: "#004A85",
+    marginTop: "1%",
+    marginBottom: "5%",
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 12,
+    },
+    shadowOpacity: 0.58,
+    shadowRadius: 16.0,
+    elevation: 24,
+  }
 });

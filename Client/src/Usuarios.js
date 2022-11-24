@@ -27,7 +27,7 @@ export default function Usuarios({ navigation }) {
 
   useEffect(() => {
     usuarios();
-  }, [filtro]);
+  }, []);
 
   async function usuarios() {
     const db = getFirestore();
@@ -123,6 +123,14 @@ export default function Usuarios({ navigation }) {
     );
   };
 
+  
+  function filtrado() {
+    let filt = usuario.filter(
+      (item) => item.usuario.toLowerCase().indexOf(filtro.toLowerCase()) > -1
+    );
+    setUsuario(filt);
+  }
+
   return (
     <View style={estilo.background}>
       <View style={estilo.container}>
@@ -141,18 +149,38 @@ export default function Usuarios({ navigation }) {
             value={filtro}
             onChangeText={(text) => setFiltro(text)}
           />
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#004A85",
+              width: "20%",              
+              height: 45,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 10,
+              marginLeft:"2%"
+            }}
+            onPress={() => filtrado()}
+          >
+            <Text style={estilo.textBtn2}>Filtar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#004A85",
+              width: "auto",
+              height: 45,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 10,
+              marginLeft: "2%",
+            }}
+            onPress={() => usuarios()}
+          >
+            <Text style={estilo.textBtn2}>Mostrar tudo</Text>
+          </TouchableOpacity>
         </View>
         <FlatList
           style={estilo.flatList}
-          data={
-            filtro
-              ? usuario.filter(
-                  (item) =>
-                    item.usuario.toLowerCase().indexOf(filtro.toLowerCase()) >
-                    -1
-                )
-              : usuario
-          }
+          data={usuario}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
         />

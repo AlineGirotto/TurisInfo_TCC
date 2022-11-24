@@ -142,7 +142,6 @@ export default function MarcaViagem({ navigation }) {
         <Text style={estilo.titulo}>
           Registre o horário de sua viagem
         </Text>
-        <View style={estilo.container3}>
           {getData(tela)}
           <Text style={estilo.txtForm}>
           Nome completo
@@ -214,7 +213,6 @@ export default function MarcaViagem({ navigation }) {
           <TouchableOpacity style={estilo.btn} onPress={onSubmit}>
             <Text style={estilo.textBtn}>Enviar</Text>
           </TouchableOpacity>
-        </View>
       </View>
     </View>
   );
