@@ -93,7 +93,6 @@ export default StyleSheet.create({
   inputF: {
     backgroundColor: "#F5F5F5",
     width: "40%",
-    marginBottom: 15,
     color: "#000000",
     fontSize: RFPercentage(1.5),
     borderRadius: 10,
@@ -113,7 +112,7 @@ export default StyleSheet.create({
     backgroundColor: "#ffffff",
     height: "auto",
     color: "#000000",
-    fontSize: 17,
+    fontSize: RFPercentage(1.5),
     borderRadius: 10,
     borderColor: "#004A85",
     borderWidth: 1,
@@ -121,10 +120,10 @@ export default StyleSheet.create({
   drop: {
     backgroundColor: "#F5F5F5",
     width: "90%",
-    height: "auto",
+    height: 45,
     marginBottom: 15,
     color: "#000000",
-    fontSize: 17,
+    fontSize: RFPercentage(1.5),
     borderRadius: 10,
     borderColor: "#004A85",
     borderWidth: 1,
@@ -268,7 +267,10 @@ export default StyleSheet.create({
   },
   modal:{
     alignItems: "center",
+    justifyContent: "center",
     margin: "10%",
+    maxHeight: "90%",
+    maxWidth: "70%",
     padding: "2%",
     backgroundColor: "#b5b5b5",
     borderRadius: 15,
@@ -284,5 +286,10 @@ export default StyleSheet.create({
     shadowOpacity: 0.58,
     shadowRadius: 16.0,
     elevation: 24,
+  },
+  ScrollView:{
+    justifyContent : 'center',
+    alignItems: "center",
+    width: '100%',
   }
 });

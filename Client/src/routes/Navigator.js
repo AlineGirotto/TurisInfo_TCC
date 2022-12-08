@@ -26,6 +26,8 @@ import ListVeiculos from "../ListVeiculos";
 import Pagamento from "../pagamentos";
 import ListPassageiro from "../ListPassageiro";
 import Instituicao from "../Instituicao";
+import ListMensalidade from "../ListMensalidade";
+import Viagens from "../Viagens";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -38,7 +40,7 @@ function logout() {
       navigation.navigate("Login");
     })
     .catch((error) => {
-      alert("Erro ao tentar deslogar");
+      //alert("Erro ao tentar deslogar");
     });
 }
 
@@ -211,11 +213,12 @@ function DraNavi() {
           ),
         }}
       />
+      
       <Drawer.Screen
-        name="Usuarios"
-        component={Usuarios}
+        name="Passageiros"
+        component={ListPassageiro}
         options={{
-          title: "Usuários cadastrados",
+          title: "Passageiros",
           headerTitleStyle: { color: "#ffffff" },
           headerStyle: { backgroundColor: "#004A85" },
           headerRight: () => (
@@ -229,7 +232,57 @@ function DraNavi() {
           },
           drawerIcon: () => (
             <Ionicons
-              name="person-circle-outline"
+              name="person-outline"
+              size={25}
+              color={"#ffffff"}
+            />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Mensalidades"
+        component={ListMensalidade}
+        options={{
+          title: "Mensalidades",
+          headerTitleStyle: { color: "#ffffff" },
+          headerStyle: { backgroundColor: "#004A85" },
+          headerRight: () => (
+            <TouchableOpacity style={{ margin: 10 }} onPress={() => logout()}>
+              <Ionicons name="exit-outline" size={30} color={"white"} />
+            </TouchableOpacity>
+          ),
+          drawerLabelStyle: {
+            fontSize: RFPercentage(1.8),
+            color: "white",
+          },
+          drawerIcon: () => (
+            <Ionicons
+              name="card-outline"
+              size={25}
+              color={"#ffffff"}
+            />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Viagens"
+        component={Viagens}
+        options={{
+          title: "Viagens",
+          headerTitleStyle: { color: "#ffffff" },
+          headerStyle: { backgroundColor: "#004A85" },
+          headerRight: () => (
+            <TouchableOpacity style={{ margin: 10 }} onPress={() => logout()}>
+              <Ionicons name="exit-outline" size={30} color={"white"} />
+            </TouchableOpacity>
+          ),
+          drawerLabelStyle: {
+            fontSize: RFPercentage(1.8),
+            color: "white",
+          },
+          drawerIcon: () => (
+            <Ionicons
+              name="trail-sign-outline"
               size={25}
               color={"#ffffff"}
             />
@@ -275,6 +328,31 @@ function DraNavi() {
           },
           drawerIcon: () => (
             <Ionicons name="school-outline" size={25} color={"#ffffff"} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Usuarios"
+        component={Usuarios}
+        options={{
+          title: "Usuários cadastrados",
+          headerTitleStyle: { color: "#ffffff" },
+          headerStyle: { backgroundColor: "#004A85" },
+          headerRight: () => (
+            <TouchableOpacity style={{ margin: 10 }} onPress={() => logout()}>
+              <Ionicons name="exit-outline" size={30} color={"white"} />
+            </TouchableOpacity>
+          ),
+          drawerLabelStyle: {
+            fontSize: RFPercentage(1.8),
+            color: "white",
+          },
+          drawerIcon: () => (
+            <Ionicons
+              name="person-circle-outline"
+              size={25}
+              color={"#ffffff"}
+            />
           ),
         }}
       />

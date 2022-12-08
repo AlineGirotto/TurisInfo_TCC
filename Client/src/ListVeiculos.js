@@ -6,6 +6,10 @@ import {
   TextInput,
   TouchableOpacity,
   Modal,
+  Platform,
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
 } from "react-native";
 import { Card } from "react-native-paper";
 import { React, useEffect, useState } from "react";
@@ -20,18 +24,24 @@ import {
   doc,
 } from "firebase/firestore";
 import { TextInputMask } from "react-native-masked-text";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import SelectDropdown from "react-native-select-dropdown";
 import { Ionicons } from "@expo/vector-icons";
 import estilo from "./css";
+import { format } from "fecha";
 
 export default function ListVeiculos({ navigation }) {
+  const [tela, setTela] = useState(false);
   const Status = ["Em manutenção", "Disponível", "Ocupado"];
   const Regular = ["Regularizado", "Pendente"];
   const [veiculo, setVeiculo] = useState([]);
   const [filtro, setFiltro] = useState("");
   const [submit, setSubmit] = useState("");
   const [nome, setNome] = useState("");
+  const [txt, setTxt] = useState("Selecione uma data");
   const [visible, setModalVisible] = useState(false);
+  const [datePicker, setDatePicker] = useState(false);
+  const [data, setDate] = useState(new Date());
   const [form, setForm] = useState({
     Modelo: "",
     Consumo: "",
@@ -49,7 +59,28 @@ export default function ListVeiculos({ navigation }) {
 
   useEffect(() => {
     veiculos();
+
+    Platform.select({
+      native: () => setTela(true),
+      default: () => setTela(false),
+    })();
   }, []);
+
+  const showDate = () => {
+    setDatePicker(true);
+  };
+
+  async function onDateSelected(event, value) {
+    if (event?.type === "dismissed") {
+      setDate(data);
+      return;
+    }
+    let dt = format(value, "DD.MM.YYYY");
+    await setDate(value);
+    await updateForm({ Fabricacao: dt });
+    await setTxt("Data: " + dt);
+    await setDatePicker(false);
+  }
 
   async function veiculos() {
     const db = getFirestore();
@@ -70,6 +101,50 @@ export default function ListVeiculos({ navigation }) {
     setVeiculo(a);
   }
 
+  function getData(tela) {
+    if (tela) {
+      return (
+        <View>
+          <TouchableOpacity style={styles.btn} onPress={() => showDate()}>
+            <Text style={estilo.textBtn}>{txt}</Text>
+          </TouchableOpacity>
+          {datePicker && (
+            <DateTimePicker
+              value={data}
+              minimumDate={new Date()}
+              mode={"date"}
+              display={Platform.OS === "ios" ? "spinner" : "default"}
+              onChange={onDateSelected}
+            />
+          )}
+        </View>
+      );
+    } else {
+      return (
+        <View
+          style={{
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <TextInputMask
+            style={estilo.input}
+            placeholder="DD.MM.AAAA"
+            type={"custom"}
+            options={{
+              mask: "99.99.9999",
+            }}
+            value={form.Fabricacao}
+            onChange={(e) => updateForm({ Fabricacao: e.target.value })}
+            keyboardType="numeric"
+            maxLength={10}
+          />
+        </View>
+      );
+    }
+  }
+
   const excluir = async (Modelo) => {
     const db = getFirestore();
     const q = query(collection(db, "Veiculos"), where("Modelo", "==", Modelo));
@@ -84,7 +159,7 @@ export default function ListVeiculos({ navigation }) {
   };
 
   const edit = async (item) => {
-    setSubmit("edit");
+    setSubmit("Edição");
     setNome(item.Modelo);
     setModalVisible(!visible);
     setForm({
@@ -98,7 +173,7 @@ export default function ListVeiculos({ navigation }) {
   };
 
   const add = async () => {
-    setSubmit("add");
+    setSubmit("Cadastro");
     setModalVisible(!visible);
   };
 
@@ -164,7 +239,7 @@ export default function ListVeiculos({ navigation }) {
   }
 
   async function onSubmit() {
-    if (submit == "edit") {
+    if (submit == "Edição") {
       const db = getFirestore();
       await deleteDoc(doc(db, "Veiculos", nome));
       await setDoc(doc(db, "Veiculos", form.Modelo), {
@@ -176,7 +251,7 @@ export default function ListVeiculos({ navigation }) {
         Regularizacao: form.Regularizacao,
       });
       alert("Edição realizada!");
-    } else if (submit == "add") {
+    } else if (submit == "Cadastro") {
       const db = getFirestore();
       await setDoc(doc(db, "Veiculos", form.Modelo), {
         Modelo: form.Modelo,
@@ -203,13 +278,14 @@ export default function ListVeiculos({ navigation }) {
   return (
     <View style={estilo.background}>
       <View style={estilo.container}>
-        <Text style={estilo.titulo2}>Veículos cadastrados:</Text>
+        <Text style={estilo.titulo2}>Veículos cadastrados</Text>
         <View
           style={{
             flexDirection: "row",
             justifyContent: "center",
             flexWrap: "wrap",
             width: "90%",
+            marginBottom: "2%",
           }}
         >
           <TouchableOpacity
@@ -222,7 +298,7 @@ export default function ListVeiculos({ navigation }) {
               justifyContent: "center",
               borderRadius: 10,
               padding: 2,
-              marginRight: '10%'
+              marginRight: "10%",
             }}
             onPress={() => add()}
           >
@@ -244,12 +320,12 @@ export default function ListVeiculos({ navigation }) {
               alignItems: "center",
               justifyContent: "center",
               borderRadius: 10,
-              marginLeft: '0.5%',
-              padding:'1%'
+              marginLeft: "0.5%",
+              padding: "1%",
             }}
             onPress={() => filtrado()}
           >
-            <Ionicons name="search-outline" size={25} color={"white"}/>
+            <Ionicons name="search-outline" size={25} color={"white"} />
           </TouchableOpacity>
           <TouchableOpacity
             style={{
@@ -259,7 +335,7 @@ export default function ListVeiculos({ navigation }) {
               alignItems: "center",
               justifyContent: "center",
               borderRadius: 10,
-              marginLeft: '1.5%'
+              marginLeft: "1.5%",
             }}
             onPress={() => veiculos()}
           >
@@ -287,105 +363,119 @@ export default function ListVeiculos({ navigation }) {
               color={"black"}
               onPress={() => {
                 setModalVisible(!visible);
+                setForm({
+                  Modelo: "",
+                  Consumo: "",
+                  Capacidade: "",
+                  Fabricacao: "",
+                  Status: "",
+                  Regularizacao: "",
+                });
               }}
-              style={{ alignSelf: "flex-end" }}
-            />
-            <Text style={estilo.titulo2}>Editar veículo</Text>
-            <TextInput
-              style={estilo.input}
-              placeholder="digite"
-              value={form.Modelo}
-              onChangeText={(e) => updateForm({ Modelo: e })}
-            />
-            <Text style={estilo.txtForm}>Consumo</Text>
-            <TextInput
-              style={estilo.input}
-              placeholder="digite"
-              keyboardType="numeric"
-              value={form.Consumo}
-              onChange={(e) => updateForm({ Consumo: e.target.value })}
-            />
-            <Text style={estilo.txtForm}>Capacidade</Text>
-            <TextInput
-              style={estilo.input}
-              placeholder="digite"
-              value={form.Capacidade}
-              onChange={(e) => updateForm({ Capacidade: e.target.value })}
-              keyboardType="numeric"
-              maxLength={3}
-            />
-            <Text style={estilo.txtForm}>Data de fabricação</Text>
-            <TextInputMask
-              style={estilo.input}
-              placeholder="DD.MM.AAAA"
-              type={"custom"}
-              options={{
-                mask: "99.99.9999",
-              }}
-              value={form.Fabricacao}
-              onChange={(e) => updateForm({ Fabricacao: e.target.value })}
-              keyboardType="numeric"
-              maxLength={10}
-            />
-            <Text style={estilo.txtForm}>Status</Text>
-            <SelectDropdown
-              data={Status}
-              onSelect={(selectedItem, index) => {
-                updateForm({ Status: selectedItem });
-              }}
-              defaultButtonText={"Status"}
-              buttonTextAfterSelection={(selectedItem, index) => {
-                return selectedItem;
-              }}
-              rowTextForSelection={(item, index) => {
-                return item;
-              }}
-              renderDropdownIcon={(isOpened) => {
-                return (
-                  <Ionicons
-                    name={isOpened ? "chevron-up" : "chevron-down"}
-                    color={"#444"}
-                    size={18}
-                  />
-                );
-              }}
-              dropdownIconPosition={"right"}
-              dropdownStyle={estilo.DropdownStyle}
-              buttonStyle={estilo.drop}
-            />
-            <Text style={estilo.txtForm}>Regularização</Text>
-            <SelectDropdown
-              data={Regular}
-              onSelect={(selectedItem, index) => {
-                updateForm({ Regularizacao: selectedItem });
-              }}
-              defaultButtonText={"Regularização"}
-              buttonTextAfterSelection={(selectedItem, index) => {
-                return selectedItem;
-              }}
-              rowTextForSelection={(item, index) => {
-                return item;
-              }}
-              renderDropdownIcon={(isOpened) => {
-                return (
-                  <Ionicons
-                    name={isOpened ? "chevron-up" : "chevron-down"}
-                    color={"#444"}
-                    size={18}
-                  />
-                );
-              }}
-              dropdownIconPosition={"right"}
-              dropdownStyle={estilo.DropdownStyle}
-              buttonStyle={estilo.drop}
+              style={{ alignSelf: "flex-end", marginTop: 15 }}
             />
 
-            <TouchableOpacity style={estilo.btn} onPress={onSubmit}>
-              <Text style={estilo.textBtn}>Salvar</Text>
-            </TouchableOpacity>
+            <Text style={estilo.titulo2}>{submit + " dos dados"}</Text>
+            <SafeAreaView style={{ width: "100%", height: "90%" }}>
+              <ScrollView contentContainerStyle={estilo.ScrollView}>
+                <TextInput
+                  style={estilo.input}
+                  placeholder="Digite o modelo ou nome"
+                  value={form.Modelo}
+                  onChangeText={(e) => updateForm({ Modelo: e })}
+                />
+                <Text style={estilo.txtForm}>Consumo</Text>
+                <TextInput
+                  style={estilo.input}
+                  placeholder="K/L"
+                  keyboardType="numeric"
+                  value={form.Consumo}
+                  onChangeText={(e) => updateForm({ Consumo: e })}
+                />
+                <Text style={estilo.txtForm}>Capacidade</Text>
+                <TextInput
+                  style={estilo.input}
+                  placeholder="Ex.: 10"
+                  value={form.Capacidade}
+                  onChangeText={(e) => updateForm({ Capacidade: e })}
+                  keyboardType="numeric"
+                  maxLength={3}
+                />
+                <Text style={estilo.txtForm}>Data de fabricação</Text>
+                {getData(tela)}
+                <Text style={estilo.txtForm}>Status</Text>
+                <SelectDropdown
+                  data={Status}
+                  onSelect={(selectedItem, index) => {
+                    updateForm({ Status: selectedItem });
+                  }}
+                  defaultButtonText={"Status"}
+                  buttonTextAfterSelection={(selectedItem, index) => {
+                    return selectedItem;
+                  }}
+                  rowTextForSelection={(item, index) => {
+                    return item;
+                  }}
+                  renderDropdownIcon={(isOpened) => {
+                    return (
+                      <Ionicons
+                        name={isOpened ? "chevron-up" : "chevron-down"}
+                        color={"#444"}
+                        size={18}
+                      />
+                    );
+                  }}
+                  dropdownIconPosition={"right"}
+                  dropdownStyle={estilo.DropdownStyle}
+                  buttonStyle={estilo.drop}
+                />
+                <Text style={estilo.txtForm}>Regularização</Text>
+                <SelectDropdown
+                  data={Regular}
+                  onSelect={(selectedItem, index) => {
+                    updateForm({ Regularizacao: selectedItem });
+                  }}
+                  defaultButtonText={"Regularização"}
+                  buttonTextAfterSelection={(selectedItem, index) => {
+                    return selectedItem;
+                  }}
+                  rowTextForSelection={(item, index) => {
+                    return item;
+                  }}
+                  renderDropdownIcon={(isOpened) => {
+                    return (
+                      <Ionicons
+                        name={isOpened ? "chevron-up" : "chevron-down"}
+                        color={"#444"}
+                        size={18}
+                      />
+                    );
+                  }}
+                  dropdownIconPosition={"right"}
+                  dropdownStyle={estilo.DropdownStyle}
+                  buttonStyle={estilo.drop}
+                />
+
+                <TouchableOpacity style={estilo.btn} onPress={onSubmit}>
+                  <Text style={estilo.textBtn}>Salvar</Text>
+                </TouchableOpacity>
+              </ScrollView>
+            </SafeAreaView>
           </View>
         </Modal>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  btn: {
+    backgroundColor: "#004A85",
+    width: 120,
+    height: 45,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+    marginBottom: "2%",
+  },
+});

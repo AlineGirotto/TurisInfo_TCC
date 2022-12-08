@@ -12,7 +12,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { TextInputMask } from "react-native-masked-text";
-import { doc, setDoc, getFirestore } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { format } from "fecha";
 import estilo from "./css";
 
@@ -64,7 +72,7 @@ export default function MarcaViagem({ navigation }) {
     let dt = format(value, "DD.MM.YYYY");
     await setDate(value);
     await updateForm({ Data: dt });
-    await setTxt("Data: " + dt)
+    await setTxt("Data: " + dt);
     await setDatePicker(false);
   }
 
@@ -78,7 +86,6 @@ export default function MarcaViagem({ navigation }) {
           {datePicker && (
             <DateTimePicker
               value={data}
-              minimumDate={new Date()}
               mode={"date"}
               display={Platform.OS === "ios" ? "spinner" : "default"}
               onChange={onDateSelected}
@@ -95,12 +102,10 @@ export default function MarcaViagem({ navigation }) {
             justifyContent: "center",
           }}
         >
-           <Text style={estilo.txtForm}>
-          Data da viagem
-        </Text>
+          <Text style={estilo.txtForm}>Data da viagem</Text>
           <TextInputMask
             style={estilo.input}
-            placeholder="DD.MM.YYYY"
+            placeholder="DD.MM.AAAA"
             type={"custom"}
             options={{
               mask: "99.99.9999",
@@ -119,11 +124,21 @@ export default function MarcaViagem({ navigation }) {
     e.preventDefault();
     setForm((form.Nome = nome));
     const db = getFirestore();
-    await setDoc(doc(db, "Viagens", JSON.stringify(form.Data)), {
-      Data: form.Data,
-      Nome: form.Nome,
-      Ida: form.Ida,
-      Volta: form.Volta,      
+    const querySnapshot = await getDocs(collection(db, "Viagens"));
+    const queryData = querySnapshot.docs.map((detail) => ({
+      ...detail.data(),
+      id: detail.id,
+    }));
+    queryData.map(async (v) => {
+      await setDoc(
+        doc(db, `Viagens/${JSON.stringify(form.Data)}/Nomes`, form.Nome),
+        {
+          Data: form.Data,
+          Nome: form.Nome,
+          Ida: form.Ida,
+          Volta: form.Volta,
+        }
+      );
     });
     alert("Cadastro de viagem realizado!");
     setForm({
@@ -139,86 +154,78 @@ export default function MarcaViagem({ navigation }) {
   return (
     <View style={estilo.background}>
       <View style={estilo.container}>
-        <Text style={estilo.titulo}>
-          Registre o horário de sua viagem
-        </Text>
-          {getData(tela)}
-          <Text style={estilo.txtForm}>
-          Nome completo
-        </Text>
-          <TextInput
-            style={estilo.input}
-            placeholder="Nome Sobrenome"
-            value={nome}
-            onChangeText={setNome}
-          />
-           <Text style={estilo.txtForm}>
-          Selecione o turno de ida
-        </Text>
-          <SelectDropdown
-            data={Turnos}
-            value={form.Ida}
-            onSelect={(selectedItem, index) => {
-              updateForm({ Ida: selectedItem });
-            }}
-            defaultButtonText={"Ida"}
-            buttonTextAfterSelection={(selectedItem, index) => {
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, index) => {
-              return item;
-            }}
-            renderDropdownIcon={(isOpened) => {
-              return (
-                <Ionicons
-                  name={isOpened ? "chevron-up" : "chevron-down"}
-                  color={"#444"}
-                  size={18}
-                />
-              );
-            }}
-            dropdownIconPosition={"right"}
-            dropdownStyle={estilo.DropdownStyle}
-            buttonStyle={estilo.drop}
-          />
-          <Text style={estilo.txtForm}>
-          Selecione o turno de retorno
-        </Text>
-          <SelectDropdown
-            data={Turnos}
-            value={form.Ida}
-            onSelect={(selectedItem, index) => {
-              updateForm({ Volta: selectedItem });
-            }}
-            defaultButtonText={"Retorno"}
-            buttonTextAfterSelection={(selectedItem, index) => {
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, index) => {
-              return item;
-            }}
-            renderDropdownIcon={(isOpened) => {
-              return (
-                <Ionicons
-                  name={isOpened ? "chevron-up" : "chevron-down"}
-                  color={"#444"}
-                  size={18}
-                />
-              );
-            }}
-            dropdownIconPosition={"right"}
-            dropdownStyle={estilo.DropdownStyle}
-            buttonStyle={estilo.drop}
-          />
-          <TouchableOpacity style={estilo.btn} onPress={onSubmit}>
-            <Text style={estilo.textBtn}>Enviar</Text>
-          </TouchableOpacity>
+        <Text style={estilo.titulo}>Registre o horário de sua viagem</Text>
+        {getData(tela)}
+        <Text style={estilo.txtForm}>Nome completo</Text>
+        <TextInput
+          style={estilo.input}
+          placeholder="Nome Sobrenome"
+          value={nome}
+          onChangeText={setNome}
+        />
+        <Text style={estilo.txtForm}>Selecione o turno de ida</Text>
+        <SelectDropdown
+          data={Turnos}
+          value={form.Ida}
+          onSelect={(selectedItem, index) => {
+            updateForm({ Ida: selectedItem });
+          }}
+          defaultButtonText={"Ida"}
+          buttonTextAfterSelection={(selectedItem, index) => {
+            return selectedItem;
+          }}
+          rowTextForSelection={(item, index) => {
+            return item;
+          }}
+          renderDropdownIcon={(isOpened) => {
+            return (
+              <Ionicons
+                name={isOpened ? "chevron-up" : "chevron-down"}
+                color={"#444"}
+                size={18}
+              />
+            );
+          }}
+          dropdownIconPosition={"right"}
+          dropdownStyle={estilo.DropdownStyle}
+          buttonStyle={estilo.drop}
+        />
+        <Text style={estilo.txtForm}>Selecione o turno de retorno</Text>
+        <SelectDropdown
+          data={Turnos}
+          value={form.Ida}
+          onSelect={(selectedItem, index) => {
+            updateForm({ Volta: selectedItem });
+          }}
+          defaultButtonText={"Retorno"}
+          buttonTextAfterSelection={(selectedItem, index) => {
+            return selectedItem;
+          }}
+          rowTextForSelection={(item, index) => {
+            return item;
+          }}
+          renderDropdownIcon={(isOpened) => {
+            return (
+              <Ionicons
+                name={isOpened ? "chevron-up" : "chevron-down"}
+                color={"#444"}
+                size={18}
+              />
+            );
+          }}
+          dropdownIconPosition={"right"}
+          dropdownStyle={estilo.DropdownStyle}
+          buttonStyle={estilo.drop}
+        />
+        <TouchableOpacity style={estilo.btn} onPress={onSubmit}>
+          <Text style={estilo.textBtn}>Enviar</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({  
+const styles = StyleSheet.create({
   btn: {
     backgroundColor: "#004A85",
     width: 120,
@@ -226,6 +233,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
-    marginBottom: "2%"
+    marginBottom: "2%",
   },
 });

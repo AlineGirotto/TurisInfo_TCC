@@ -20,6 +20,7 @@ import {
   doc,
 } from "firebase/firestore";
 import estilo from "./css";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Usuarios({ navigation }) {
   const [usuario, setUsuario] = useState([]);
@@ -115,7 +116,7 @@ export default function Usuarios({ navigation }) {
               style={estilo.btncard}
               onPress={() => excluirUsu(item.usuario)}
             >
-              <Text style={estilo.textBtn2}>Excluir Usuário</Text>
+               <Ionicons name="trash-outline" size={25} color={"white"} />
             </Pressable>
           </Card.Actions>
         </Card>
@@ -134,13 +135,14 @@ export default function Usuarios({ navigation }) {
   return (
     <View style={estilo.background}>
       <View style={estilo.container}>
-        <Text style={estilo.titulo}>Usuários cadastrados no sistema:</Text>
+        <Text style={estilo.titulo}>Usuários cadastrados</Text>
         <View
           style={{
             flexDirection: "row",
             justifyContent: "flex-end",
             alignSelf: "flex-end",
             marginRight: "5%",
+            marginBottom: "5%"
           }}
         >
           <TextInput
