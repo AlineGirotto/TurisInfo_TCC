@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  Image,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { Card } from "react-native-paper";
@@ -20,9 +21,10 @@ import {
   getFirestore,
   deleteDoc,
   setDoc,
-  addDoc,
   doc,
+  collectionGroup,
 } from "firebase/firestore";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { TextInputMask } from "react-native-masked-text";
 import estilo from "./css";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -43,6 +45,9 @@ export default function ListPassageiro({ navigation }) {
   const [submit, setSubmit] = useState("");
   const [nome, setNome] = useState("");
   const [visible, setModalVisible] = useState(false);
+  const [image, setImage] = useState(null);
+  const [imageName, setImageName] = useState("");
+  const [cad, setcad] = useState(false);
   const [form, setForm] = useState({
     Nome: "",
     RG: "",
@@ -87,7 +92,7 @@ export default function ListPassageiro({ navigation }) {
 
   async function passageiros() {
     const db = getFirestore();
-    const q = query(collection(db, "Passageiros"), where("Nome", "!=", " "));
+    const q = query(collection(db, "Passageiros"));
     const querySnapshot = await getDocs(q);
     let a = [];
     querySnapshot.forEach((doc) => {
@@ -112,6 +117,27 @@ export default function ListPassageiro({ navigation }) {
     });
     setPassageiro(a);
   }
+
+  const pickImage = async (e) => {
+    if (e.target.files[0]) {
+      setImage({
+        preview: URL.createObjectURL(e.target.files[0]),
+        raw: e.target.files[0],
+      });
+      setImageName(e.target.files[0].name);
+    }
+  };
+
+  const uploadImage = async () => {
+    const storage = getStorage();
+    const storageRef = ref(storage, `Contratos/${imageName}`);
+    uploadBytes(storageRef, image.raw)
+      .then((snapshot) => {
+      })
+      .catch((error) => {
+        console.log("Erro ao fazer upload");
+      });
+  };
 
   async function executaPesquisa() {
     const url = "https://viacep.com.br/ws/" + form.CEP + "/json/";
@@ -151,11 +177,12 @@ export default function ListPassageiro({ navigation }) {
       Contato: item.Contato,
       Email: item.Email,
       Contrato: item.Contrato,
-    })
+    });
     setSubmit("Edição");
     setNome(item.Nome);
     setModalVisible(!visible);
-    setdropcfp(false);
+    setdropcfp(true);
+    setcad(false);
   };
 
   const excluir = async (user) => {
@@ -167,13 +194,14 @@ export default function ListPassageiro({ navigation }) {
       id = doc.id;
     });
     await deleteDoc(doc(db, "Passageiros", id));
-    instituicoes();
     alert("Registro excluído!");
+    instituicoes();
   };
 
   const add = async () => {
     setSubmit("Cadastro");
     setModalVisible(!visible);
+    setcad(true)
   };
 
   const renderItem = ({ item }) => {
@@ -269,45 +297,35 @@ export default function ListPassageiro({ navigation }) {
     setPassageiro(filt);
   }
 
+  async function cadastra() {
+    const db = getFirestore();
+    await setDoc(doc(db, "Passageiros", form.Nome), {
+      Nome: form.Nome,
+      RG: form.RG,
+      CPF: form.CPF,
+      DtNascimento: form.DtNascimento,
+      EstadoCivil: form.EstadoCivil,
+      Instituicao: form.Instituicao,
+      CEP: form.CEP,
+      Bairro: form.Bairro,
+      Numero: form.Numero,
+      Rua: form.Rua,
+      Complemento: form.Complemento,
+      Contato: form.Contato,
+      Email: form.Email,
+      Contrato: form.Contrato,
+    });
+    await uploadImage();
+  }
+
   async function onSubmit() {
     if (submit == "Edição") {
       const db = getFirestore();
-     await deleteDoc(doc(db, "Passageiros", nome));
-      await setDoc(doc(db, "Passageiros", form.Nome), {
-        Nome: form.Nome,
-        RG: form.RG,
-        CPF: form.CPF,
-        DtNascimento: form.DtNascimento,
-        EstadoCivil: form.EstadoCivil,
-        Instituicao: form.Instituicao,
-        CEP: form.CEP,
-        Bairro: form.Bairro,
-        Numero: form.Numero,
-        Rua: form.Rua,
-        Complemento: form.Complemento,
-        Contato: form.Contato,
-        Email: form.Email,
-        Contrato: form.Contrato,
-      });
+      await deleteDoc(doc(db, "Passageiros", nome));
+      cadastra();
       alert("Edição realizada!");
     } else if (submit == "Cadastro") {
-      const db = getFirestore();
-      await setDoc(doc(db, "Passageiros", form.Nome), {
-        Nome: form.Nome,
-        RG: form.RG,
-        CPF: form.CPF,
-        DtNascimento: form.DtNascimento,
-        EstadoCivil: form.EstadoCivil,
-        Instituicao: form.Instituicao,
-        CEP: form.CEP,
-        Bairro: form.Bairro,
-        Numero: form.Numero,
-        Rua: form.Rua,
-        Complemento: form.Complemento,
-        Contato: form.Contato,
-        Email: form.Email,
-        Contrato: "form.Contrato",
-      });
+      cadastra();
       alert("Cadastro realizado!");
     }
     setModalVisible(!visible);
@@ -673,20 +691,19 @@ export default function ListPassageiro({ navigation }) {
                     />
                   </View>
                 )}
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: "#004A85",
-                    width: "90%",
-                    height: 45,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: 10,
-                    marginBottom: 15,
-                  }}
-                >
-                  <Text style={estilo.textBtn}>Cadastrar um contrato</Text>
-                </TouchableOpacity>
-
+                {cad && (
+                  <input
+                  type="file"
+                  onChange={pickImage}
+                  style={{ margin: "2%" }}
+                />                
+                )}
+                {image && (
+                  <Image
+                    source={image.preview}
+                    style={{ width: 200, height: 200, margin: "1%" }}
+                  />
+                )}
                 <TouchableOpacity style={estilo.btn} onPress={onSubmit}>
                   <Text style={estilo.textBtn}>Salvar</Text>
                 </TouchableOpacity>

@@ -6,7 +6,6 @@ import {
   TextInput,
   TouchableOpacity,
   Modal,
-  Platform,
   StyleSheet,
   ScrollView,
   SafeAreaView,
@@ -24,32 +23,36 @@ import {
   doc,
 } from "firebase/firestore";
 import { TextInputMask } from "react-native-masked-text";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import SelectDropdown from "react-native-select-dropdown";
 import { Ionicons } from "@expo/vector-icons";
 import estilo from "./css";
-import { format } from "fecha";
+import { RFPercentage } from "react-native-responsive-fontsize";
 
 export default function ListMensalidade({ navigation }) {
-  const [tela, setTela] = useState(false);
-  const Status = ["Em manutenção", "Disponível", "Ocupado"];
-  const Regular = ["Regularizado", "Pendente"];
-  const [veiculo, setVeiculo] = useState([]);
+  const meses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  const status = ["Paga", "Não paga"];
+  const [msg, setMsg] = useState(
+    "Selecione um passageiro(a) para buscar as mensalidades!"
+  );
+  const [texto,  setTexto] = useState("");
+  const [passageiro, setPassageiro] = useState([]);
+  const [mensalidade, setMensalidade] = useState([]);
   const [filtro, setFiltro] = useState("");
-  const [submit, setSubmit] = useState("");
-  const [nome, setNome] = useState("");
-  const [txt, setTxt] = useState("Selecione uma data");
+  const [mes, setMes] = useState("Mês");
+  const [inputNome, setinputNome] = useState("Passageiro(a)");
+  const [valor, setvalor] = useState("");
   const [visible, setModalVisible] = useState(false);
-  const [datePicker, setDatePicker] = useState(false);
-  const [data, setDate] = useState(new Date());
+  const [visible2, setModalVisible2] = useState(false);
   const [form, setForm] = useState({
-    Modelo: "",
-    Consumo: "",
-    Capacidade: "",
-    Fabricacao: "",
-    Status: "",
-    Regularizacao: "",
+    id:"",
+    Pago: "",
+    Meses: "",
+    Valor: "",
   });
+
+  useEffect(() => {
+    passageiros();
+  }, []);
 
   function updateForm(value) {
     return setForm((prev) => {
@@ -57,127 +60,131 @@ export default function ListMensalidade({ navigation }) {
     });
   }
 
-  useEffect(() => {
-    veiculos();
-
-    Platform.select({
-      native: () => setTela(true),
-      default: () => setTela(false),
-    })();
-  }, []);
-
-  const showDate = () => {
-    setDatePicker(true);
-  };
-
-  async function onDateSelected(event, value) {
-    if (event?.type === "dismissed") {
-      setDate(data);
-      return;
-    }
-    let dt = format(value, "DD.MM.YYYY");
-    await setDate(value);
-    await updateForm({ Fabricacao: dt });
-    await setTxt("Data: " + dt);
-    await setDatePicker(false);
-  }
-
-  async function veiculos() {
+  async function passageiros() {
     const db = getFirestore();
-    const q = query(collection(db, "Veiculos"), where("Modelo", "!=", " "));
+    const q = query(collection(db, "Passageiros"));
     const querySnapshot = await getDocs(q);
     let a = [];
     querySnapshot.forEach((doc) => {
-      const x = {
-        Modelo: doc.data().Modelo,
-        Consumo: doc.data().Consumo,
-        Capacidade: doc.data().Capacidade,
-        Fabricacao: doc.data().Fabricacao,
-        Status: doc.data().Status,
-        Regularizacao: doc.data().Regularizacao,
-      };
-      a.push(x);
+      a.push(doc.data().Nome);
     });
-    setVeiculo(a);
+    setPassageiro(a);
   }
 
-  function getData(tela) {
-    if (tela) {
-      return (
-        <View>
-          <TouchableOpacity style={styles.btn} onPress={() => showDate()}>
-            <Text style={estilo.textBtn}>{txt}</Text>
-          </TouchableOpacity>
-          {datePicker && (
-            <DateTimePicker
-              value={data}
-              minimumDate={new Date()}
-              mode={"date"}
-              display={Platform.OS === "ios" ? "spinner" : "default"}
-              onChange={onDateSelected}
-            />
-          )}
-        </View>
-      );
-    } else {
-      return (
-        <View
-          style={{
-            width: "100%",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <TextInputMask
-            style={estilo.input}
-            placeholder="DD.MM.AAAA"
-            type={"custom"}
-            options={{
-              mask: "99.99.9999",
-            }}
-            value={form.Fabricacao}
-            onChange={(e) => updateForm({ Fabricacao: e.target.value })}
-            keyboardType="numeric"
-            maxLength={10}
-          />
-        </View>
-      );
-    }
-  }
-
-  const excluir = async (Modelo) => {
+  async function mensalidades() {
     const db = getFirestore();
-    const q = query(collection(db, "Veiculos"), where("Modelo", "==", Modelo));
-    const querySnapshot = await getDocs(q);
-    let id = "";
-    querySnapshot.forEach((doc) => {
-      id = doc.data().Modelo;
+    const p = query(collection(db, "Passageiros"), where("Nome", "==", filtro));
+    const querySnapshotp = await getDocs(p);
+    let a = [];
+    querySnapshotp.forEach((doc) => {
+      a = doc.data().Email;
     });
-    await deleteDoc(doc(db, "Veiculos", id));
-    veiculos();
-    alert("Veículo excluído!");
+    const q = query(collection(db, "Mensalidades"));
+    const snapshot = await getDocs(q);
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+    }));
+    const f = JSON.stringify(a);
+    data.map(async (elem) => {
+      const workQ = query(collection(db, `Mensalidades/${f}/Meses`));
+      const workDetails = await getDocs(workQ);
+      let a = [];
+      workDetails.docs.map((doc) => {
+        const x = {
+          id: doc.id,
+          Meses: doc.data().Meses,
+          Valor: doc.data().Valor,
+          Pago: doc.data().Pago,
+        };
+        a.push(x);
+      });
+      setMensalidade(a);
+    });
+  }
+
+  const excluir = async (x) => {
+    const db = getFirestore();
+    const p = query(collection(db, "Passageiros"), where("Nome", "==", filtro));
+    const querySnapshotp = await getDocs(p);
+    let a = [];
+    querySnapshotp.forEach((doc) => {
+      a = doc.data().Email;
+    });    
+    const f = JSON.stringify(a);
+    const querySnapshot = await getDocs(collection(db, "Mensalidades"));
+    const queryData = querySnapshot.docs.map((detail) => ({
+      ...detail.data(),
+      id: detail.id,
+    }));
+    queryData.map(async (v) => {
+      await deleteDoc(
+        doc(db, `Mensalidades/${(f)}/Meses`, x)
+      );
+    });
+    mensalidades();
+    alert("Mensalidade excluída!");
   };
 
-  const edit = async (item) => {
-    setSubmit("Edição");
-    setNome(item.Modelo);
-    setModalVisible(!visible);
-    setForm({
-      Modelo: item.Modelo,
-      Consumo: item.Consumo,
-      Capacidade: item.Capacidade,
-      Fabricacao: item.Fabricacao,
-      Status: item.Status,
-      Regularizacao: item.Regularizacao,
+  const edit = async () => {
+    let identificacao = form.id;
+    let adm = false;
+    if (form.Pago == "Paga") {
+      adm = true;      
+    } else {
+      adm = false;
+    }
+    const db = getFirestore();
+    const q = query(collection(db, "Passageiros"), where("Nome", "==", filtro));
+    const querySnap = await getDocs(q);
+    let x = [];
+    querySnap.forEach((doc) => {
+      x = doc.data().Email;
     });
-  };
-
-  const add = async () => {
-    setSubmit("Cadastro");
-    setModalVisible(!visible);
+    const querySnapshot = await getDocs(collection(db, "Mensalidades"));
+    const queryData = querySnapshot.docs.map((detail) => ({
+      ...detail.data(),
+      id: detail.id,
+    }));
+    queryData.map(async (v) => {
+      await setDoc(
+        doc(db, `Mensalidades/${JSON.stringify(x)}/Meses`, identificacao),
+        {
+          Meses: form.Meses,
+          Valor: form.Valor,
+          Pago: adm,
+        }
+      );
+    });
+    alert("Mensalidade alterada!");
+    setModalVisible2(!visible2);
+    mensalidades();
   };
 
   const renderItem = ({ item }) => {
+    let adm = false;
+    let info = false;
+    if (item.Pago) {
+      adm = "Paga";
+      info = {
+        fontSize: RFPercentage(1.5),
+        textAlign: "center",
+        alignSelf: "center",
+        marginLeft: "1%",
+        fontStyle: "italic",
+        color: "green",
+      };
+    } else {
+      adm = "Não paga";
+      info = {
+        fontSize: RFPercentage(1.5),
+        textAlign: "center",
+        alignSelf: "center",
+        marginLeft: "1%",
+        fontStyle: "italic",
+        color: "red",
+      };
+    }
+
     return (
       <View
         style={{
@@ -191,37 +198,33 @@ export default function ListMensalidade({ navigation }) {
         <Card style={estilo.card}>
           <Card.Content style={estilo.coluna}>
             <View style={estilo.linha}>
-              <Text style={estilo.txtFlat}>Modelo:</Text>
-              <Text style={estilo.info}>{item.Modelo}</Text>
+              <Text style={estilo.txtFlat}>Mês:</Text>
+              <Text style={estilo.info}>{item.Meses}</Text>
             </View>
             <View style={estilo.linha}>
-              <Text style={estilo.txtFlat}>Consumo:</Text>
-              <Text style={estilo.info}>{item.Consumo}</Text>
+              <Text style={estilo.txtFlat}>Valor das parcelas:</Text>
+              <Text style={estilo.info}>{item.Valor}</Text>
             </View>
             <View style={estilo.linha}>
-              <Text style={estilo.txtFlat}>Capacidade:</Text>
-              <Text style={estilo.info}>{item.Capacidade}</Text>
-            </View>
-            <View style={estilo.linha}>
-              <Text style={estilo.txtFlat}>Fabricacao:</Text>
-              <Text style={estilo.info}>{item.Fabricacao}</Text>
-            </View>
-            <View style={estilo.linha}>
-              <Text style={estilo.txtFlat}>Status:</Text>
-              <Text style={estilo.info}>{item.Status}</Text>
-            </View>
-            <View style={estilo.linha}>
-              <Text style={estilo.txtFlat}>Regularização:</Text>
-              <Text style={estilo.info}>{item.Regularizacao}</Text>
+              <Text style={estilo.txtFlat}>Status</Text>
+              <Text style={info}>{adm}</Text>
             </View>
           </Card.Content>
           <Card.Actions style={estilo.cardAct}>
-            <Pressable style={estilo.btncard} onPress={() => edit(item)}>
+            <Pressable style={estilo.btncard} onPress={() => ( setModalVisible2(!visible2),
+                updateForm({
+                  id: item.id,
+                  Meses: item.Meses,
+                  Valor: item.Valor,
+                  Pago: item.Pago,
+                }),
+                setTexto(adm)
+              )}>
               <Ionicons name="pencil-outline" size={25} color={"white"} />
             </Pressable>
             <Pressable
               style={estilo.btncard}
-              onPress={() => excluir(item.Modelo)}
+              onPress={() => excluir(item.id)}
             >
               <Ionicons name="trash-outline" size={25} color={"white"} />
             </Pressable>
@@ -231,48 +234,42 @@ export default function ListMensalidade({ navigation }) {
     );
   };
 
-  function filtrado() {
-    let filt = veiculo.filter(
-      (item) => item.Modelo.toLowerCase().indexOf(filtro.toLowerCase()) > -1
-    );
-    setVeiculo(filt);
-  }
-
   async function onSubmit() {
-    if (submit == "Edição") {
-      const db = getFirestore();
-      await deleteDoc(doc(db, "Veiculos", nome));
-      await setDoc(doc(db, "Veiculos", form.Modelo), {
-        Modelo: form.Modelo,
-        Consumo: form.Consumo,
-        Capacidade: form.Capacidade,
-        Fabricacao: form.Fabricacao,
-        Status: form.Status,
-        Regularizacao: form.Regularizacao,
+    const db = getFirestore();
+    const q = query(
+      collection(db, "Passageiros"),
+      where("Nome", "==", inputNome)
+    );
+    const querySnapshot = await getDocs(q);
+    let x = [];
+    querySnapshot.forEach((doc) => {
+      x = doc.data().Email;
+    });
+    for (let i = 1; i < mes + 1; i++) {
+      const querySnapshot = await getDocs(collection(db, "Mensalidades"));
+      const queryData = querySnapshot.docs.map((detail) => ({
+        ...detail.data(),
+        id: detail.id,
+      }));
+      queryData.map(async (v) => {
+        await setDoc(
+          doc(db, `Mensalidades/${JSON.stringify(x)}/Meses`, JSON.stringify(i)),
+          {
+            Meses: i,
+            Valor: valor,
+            Pago: false,
+          }
+        );
       });
-      alert("Edição realizada!");
-    } else if (submit == "Cadastro") {
-      const db = getFirestore();
-      await setDoc(doc(db, "Veiculos", form.Modelo), {
-        Modelo: form.Modelo,
-        Consumo: form.Consumo,
-        Capacidade: form.Capacidade,
-        Fabricacao: form.Fabricacao,
-        Status: form.Status,
-        Regularizacao: form.Regularizacao,
-      });
-      alert("Cadastro realizado!");
     }
+    alert("Cadastro realizado!");
     setModalVisible(!visible);
     setForm({
-      Modelo: "",
-      Consumo: "",
-      Capacidade: "",
-      Fabricacao: "",
-      Status: "",
-      Regularizacao: "",
+      Nome: "Passageiro(a)",
+      Meses: "Mês",
+      Valor: "",
     });
-    veiculos();
+    mensalidades();
   }
 
   return (
@@ -300,17 +297,37 @@ export default function ListMensalidade({ navigation }) {
               padding: 2,
               marginRight: "10%",
             }}
-            onPress={() => add()}
+            onPress={() => {
+              setModalVisible(!visible)}}
           >
             <Ionicons name="add-outline" size={15} color={"white"} />
             <Text style={estilo.textBtn2}>Adicionar mensalidade</Text>
           </TouchableOpacity>
-
-          <TextInput
-            style={estilo.inputF}
-            placeholder="Filtro"
+          <SelectDropdown
+            data={passageiro}
             value={filtro}
-            onChangeText={(text) => setFiltro(text)}
+            onSelect={(selectedItem, index) => {
+              setFiltro(selectedItem);
+            }}
+            defaultButtonText={inputNome}
+            buttonTextAfterSelection={(selectedItem, index) => {
+              return selectedItem;
+            }}
+            rowTextForSelection={(item, index) => {
+              return item;
+            }}
+            renderDropdownIcon={(isOpened) => {
+              return (
+                <Ionicons
+                  name={isOpened ? "chevron-up" : "chevron-down"}
+                  color={"#444"}
+                  size={18}
+                />
+              );
+            }}
+            dropdownIconPosition={"right"}
+            dropdownStyle={style.DropdownStyle}
+            buttonStyle={style.drop}
           />
           <TouchableOpacity
             style={{
@@ -323,11 +340,22 @@ export default function ListMensalidade({ navigation }) {
               marginLeft: "0.5%",
               padding: "1%",
             }}
-            onPress={() => filtrado()}
+            onPress={() => {
+              mensalidades();
+              setMsg("Mensalidades de " + filtro);
+            }}
           >
             <Ionicons name="search-outline" size={25} color={"white"} />
           </TouchableOpacity>
-          <TouchableOpacity
+        </View>
+        <Text style={style.titulo}>{msg}</Text>
+        <FlatList
+          style={estilo.flatList}
+          data={mensalidade}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+        />
+        <TouchableOpacity
             style={{
               backgroundColor: "#004A85",
               width: "auto",
@@ -337,17 +365,10 @@ export default function ListMensalidade({ navigation }) {
               borderRadius: 10,
               marginLeft: "1.5%",
             }}
-            onPress={() => veiculos()}
+            onPress={() => excluir()}
           >
-            <Text style={estilo.textBtn2}>Mostrar tudo</Text>
+            <Text style={estilo.textBtn2}>Excluir todas mensalidades</Text>
           </TouchableOpacity>
-        </View>
-        <FlatList
-          style={estilo.flatList}
-          data={veiculo}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.Modelo}
-        />
         <Modal
           animationType="slide"
           transparent={true}
@@ -364,52 +385,23 @@ export default function ListMensalidade({ navigation }) {
               onPress={() => {
                 setModalVisible(!visible);
                 setForm({
-                  Modelo: "",
-                  Consumo: "",
-                  Capacidade: "",
-                  Fabricacao: "",
-                  Status: "",
-                  Regularizacao: "",
+                  Pago: "",
+                  Meses: "",
+                  Valor: "",
                 });
               }}
-              style={{ alignSelf: "flex-end", marginTop: 15 }}
+              style={{ alignSelf: "flex-end", marginTop: "15%" }}
             />
-
-            <Text style={estilo.titulo2}>{submit + " dos dados"}</Text>
+            <Text style={estilo.titulo2}>{"Cadastro de mensalidade"}</Text>
             <SafeAreaView style={{ width: "100%", height: "90%" }}>
               <ScrollView contentContainerStyle={estilo.ScrollView}>
-                <TextInput
-                  style={estilo.input}
-                  placeholder="Digite o modelo ou nome"
-                  value={form.Modelo}
-                  onChangeText={(e) => updateForm({ Modelo: e })}
-                />
-                <Text style={estilo.txtForm}>Consumo</Text>
-                <TextInput
-                  style={estilo.input}
-                  placeholder="K/L"
-                  keyboardType="numeric"
-                  value={form.Consumo}
-                  onChangeText={(e) => updateForm({ Consumo: e })}
-                />
-                <Text style={estilo.txtForm}>Capacidade</Text>
-                <TextInput
-                  style={estilo.input}
-                  placeholder="Ex.: 10"
-                  value={form.Capacidade}
-                  onChangeText={(e) => updateForm({ Capacidade: e })}
-                  keyboardType="numeric"
-                  maxLength={3}
-                />
-                <Text style={estilo.txtForm}>Data de fabricação</Text>
-                {getData(tela)}
-                <Text style={estilo.txtForm}>Status</Text>
                 <SelectDropdown
-                  data={Status}
+                  data={passageiro}
+                  value={inputNome}
                   onSelect={(selectedItem, index) => {
-                    updateForm({ Status: selectedItem });
+                    setinputNome(selectedItem);
                   }}
-                  defaultButtonText={"Status"}
+                  defaultButtonText={inputNome}
                   buttonTextAfterSelection={(selectedItem, index) => {
                     return selectedItem;
                   }}
@@ -429,34 +421,116 @@ export default function ListMensalidade({ navigation }) {
                   dropdownStyle={estilo.DropdownStyle}
                   buttonStyle={estilo.drop}
                 />
-                <Text style={estilo.txtForm}>Regularização</Text>
-                <SelectDropdown
-                  data={Regular}
-                  onSelect={(selectedItem, index) => {
-                    updateForm({ Regularizacao: selectedItem });
-                  }}
-                  defaultButtonText={"Regularização"}
-                  buttonTextAfterSelection={(selectedItem, index) => {
-                    return selectedItem;
-                  }}
-                  rowTextForSelection={(item, index) => {
-                    return item;
-                  }}
-                  renderDropdownIcon={(isOpened) => {
-                    return (
-                      <Ionicons
-                        name={isOpened ? "chevron-up" : "chevron-down"}
-                        color={"#444"}
-                        size={18}
-                      />
-                    );
-                  }}
-                  dropdownIconPosition={"right"}
-                  dropdownStyle={estilo.DropdownStyle}
-                  buttonStyle={estilo.drop}
-                />
-
+                <Text style={estilo.txt}>
+                  {"Selecione a quantidade de meses: "}
+                </Text>
+                <View style={style.linha}>
+                  <SelectDropdown
+                    data={meses}
+                    value={mes}
+                    onSelect={(selectedItem, index) => {
+                      setMes(selectedItem);
+                    }}
+                    defaultButtonText={mes}
+                    buttonTextAfterSelection={(selectedItem, index) => {
+                      return selectedItem;
+                    }}
+                    rowTextForSelection={(item, index) => {
+                      return item;
+                    }}
+                    renderDropdownIcon={(isOpened) => {
+                      return (
+                        <Ionicons
+                          name={isOpened ? "chevron-up" : "chevron-down"}
+                          color={"#444"}
+                          size={18}
+                        />
+                      );
+                    }}
+                    dropdownIconPosition={"right"}
+                    dropdownStyle={style.DropdownStyle}
+                    buttonStyle={style.drop}
+                  />
+                  <TextInputMask
+                    style={style.input}
+                    type={"money"}
+                    placeholder={"Digite o valor"}
+                    value={valor}
+                    onChangeText={(text) => setvalor(text)}
+                  />
+                </View>
                 <TouchableOpacity style={estilo.btn} onPress={onSubmit}>
+                  <Text style={estilo.textBtn}>Salvar</Text>
+                </TouchableOpacity>
+              </ScrollView>
+            </SafeAreaView>
+          </View>
+        </Modal>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={visible2}
+          onRequestClose={() => {
+            setModalVisible2(!visible2);
+          }}
+        >
+          <View style={estilo.modal}>
+            <Ionicons
+              name="close-circle-outline"
+              size={25}
+              color={"black"}
+              onPress={() => {
+                setModalVisible2(!visible2);
+                setForm({
+                  Pago: "",
+                  Meses: "",
+                  Valor: "",
+                });
+              }}
+              style={{ alignSelf: "flex-end", marginTop: "15%" }}
+            />
+            <Text style={estilo.titulo2}>{"Edição da mensalidade"}</Text>
+            <SafeAreaView style={{ width: "100%", height: "90%" }}>
+              <ScrollView contentContainerStyle={estilo.ScrollView}>   
+                <Text style={estilo.txt}>
+                  {"Status de pagamento:"}
+                </Text>             
+                <View style={style.linha}>
+                  <SelectDropdown
+                    data={status}
+                    value={form.Pago}
+                    onSelect={(selectedItem, index) => {
+                      updateForm({Pago: selectedItem})
+                    }}
+                    defaultButtonText={texto}
+                    buttonTextAfterSelection={(selectedItem, index) => {
+                      return selectedItem;
+                    }}
+                    rowTextForSelection={(item, index) => {
+                      return item;
+                    }}
+                    renderDropdownIcon={(isOpened) => {
+                      return (
+                        <Ionicons
+                          name={isOpened ? "chevron-up" : "chevron-down"}
+                          color={"#444"}
+                          size={18}
+                        />
+                      );
+                    }}
+                    dropdownIconPosition={"right"}
+                    dropdownStyle={style.DropdownStyle}
+                    buttonStyle={style.drop}
+                  />
+                  <TextInputMask
+                    style={style.input}
+                    type={"money"}
+                    placeholder={"Digite o valor"}
+                    value={form.Valor}
+                    onChangeText={(text) => updateForm({Valor:text})}
+                  />
+                </View>
+                <TouchableOpacity style={estilo.btn} onPress={edit}>
                   <Text style={estilo.textBtn}>Salvar</Text>
                 </TouchableOpacity>
               </ScrollView>
@@ -468,14 +542,74 @@ export default function ListMensalidade({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const style = StyleSheet.create({
+  DropdownStyle: {
+    backgroundColor: "#ffffff",
+    height: "auto",
+    color: "#000000",
+    fontSize: RFPercentage(1.5),
+    borderRadius: 10,
+    borderColor: "#004A85",
+    borderWidth: 1,
+  },
+  drop: {
+    backgroundColor: "#F5F5F5",
+    height: 45,
+    width: "40%",
+    color: "#000000",
+    fontSize: RFPercentage(1.5),
+    borderRadius: 10,
+    borderColor: "#004A85",
+    borderWidth: 1,
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 7.49,
+    elevation: 12,
+    marginLeft: "3%",
+  },
+  linha: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: "2%",
+  },
+  titulo: {
+    padding: 10,
+    textAlign: "left",
+    fontSize: RFPercentage(2),
+  },
+  input: {
+    backgroundColor: "#F5F5F5",
+    width: "90%",
+    color: "#000000",
+    fontSize: RFPercentage(1.5),
+    borderRadius: 10,
+    borderWidth: 0.5,
+    padding: 10,
+    borderColor: "#004A85",
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.58,
+    shadowRadius: 5,
+    elevation: 10,
+    marginLeft: "1%",
+    marginRight: "1%",
+  },
   btn: {
     backgroundColor: "#004A85",
-    width: 120,
+    width: "25%",
     height: 45,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
-    marginBottom: "2%",
+    margin: "2%",
+    padding: "1%",
   },
 });

@@ -28,6 +28,7 @@ export default function Viagens({ navigation }) {
   const [viagem, setViagem] = useState([]);
   const [busca, setBusca] = useState("");
   const [filtro, setFiltro] = useState("");
+  const [msg, setMsg] = useState("Digite uma data no campo de busca!");
 
   useEffect(() => {
     viagens();
@@ -38,7 +39,6 @@ export default function Viagens({ navigation }) {
     const q = query(collection(db, "Viagens"));
     const snapshot = await getDocs(q);
     const data = snapshot.docs.map((doc) => ({
-      ...doc.data(),
       id: doc.id,
     }));
     data.map(async (elem) => {
@@ -47,7 +47,7 @@ export default function Viagens({ navigation }) {
       );
       const workDetails = await getDocs(workQ);
       let a = [];
-      const workInfo = workDetails.docs.map((doc) => {
+      workDetails.docs.map((doc) => {
         const x = {
           id: doc.id,
           Nome: doc.data().Nome,
@@ -61,7 +61,7 @@ export default function Viagens({ navigation }) {
     });
   }
 
-  const excluirUsu = async (user) => {
+  /*const excluirUsu = async (user) => {
     const db = getFirestore();
     const q = query(collection(db, "Usuarios"), where("Usuario", "==", user));
     const querySnapshot = await getDocs(q);
@@ -72,7 +72,7 @@ export default function Viagens({ navigation }) {
     await deleteDoc(doc(db, "Usuarios", id));
     viagens();
     alert("Usuário excluído!");
-  };
+  };*/
 
   const renderItem = ({ item }) => {
     return (
@@ -100,31 +100,10 @@ export default function Viagens({ navigation }) {
               <Text style={estilo.info}>{item.Volta}</Text>
             </View>
           </Card.Content>
-          <Card.Actions style={estilo.cardAct}>
-            <Pressable
-              style={estilo.btncard}
-              onPress={() => mudaAdm(item.Nome)}
-            >
-              <Text style={estilo.textBtn2}>Mudar Permissão</Text>
-            </Pressable>
-            <Pressable
-              style={estilo.btncard}
-              onPress={() => excluirUsu(item.Nome)}
-            >
-              <Ionicons name="trash-outline" size={25} color={"white"} />
-            </Pressable>
-          </Card.Actions>
         </Card>
       </View>
     );
   };
-
-  function filtrado() {}
-
-  function filtrado2() {
-    let filt = viagem.filter((item) => item.Volta == filtro);
-    setViagem(filt);
-  }
 
   return (
     <View style={estilo.background}>
@@ -133,10 +112,10 @@ export default function Viagens({ navigation }) {
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "flex-end",
-            alignSelf: "flex-end",
-            marginRight: "5%",
-            marginBottom: "5%",
+            justifyContent: "center",
+            flexWrap: "wrap",
+            width: "90%",
+            marginBottom: "2%",
           }}
         >
           <TextInputMask
@@ -161,7 +140,10 @@ export default function Viagens({ navigation }) {
               borderRadius: 10,
               marginLeft: "2%",
             }}
-            onPress={() => viagens()}
+            onPress={() => {
+              viagens();
+              setMsg("Data da viagem: " + busca);
+            }}
           >
             <Text style={estilo.textBtn2}>Buscar</Text>
           </TouchableOpacity>
@@ -220,7 +202,7 @@ export default function Viagens({ navigation }) {
             buttonStyle={style.drop}
           />
         </View>
-        <Text style={estilo.titulo}>{"Data da viagem: " + busca}</Text>
+        <Text style={style.titulo}>{msg}</Text>
         <FlatList
           style={estilo.flatList}
           data={viagem}
@@ -245,13 +227,12 @@ const style = StyleSheet.create({
   drop: {
     backgroundColor: "#F5F5F5",
     height: 45,
-    width: "auto",
+    width: "40%",
     color: "#000000",
     fontSize: RFPercentage(1.5),
     borderRadius: 10,
     borderColor: "#004A85",
     borderWidth: 1,
-    padding: 10,
     shadowColor: "black",
     shadowOffset: {
       width: 0,
@@ -261,5 +242,10 @@ const style = StyleSheet.create({
     shadowRadius: 7.49,
     elevation: 12,
     marginLeft: "3%",
+  },
+  titulo: {
+    padding: 10,
+    textAlign: "left",
+    fontSize: RFPercentage(2),
   },
 });
