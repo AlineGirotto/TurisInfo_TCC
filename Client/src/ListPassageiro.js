@@ -22,9 +22,14 @@ import {
   deleteDoc,
   setDoc,
   doc,
-  collectionGroup,
 } from "firebase/firestore";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  deleteObject,
+  getDownloadURL,
+} from "firebase/storage";
 import { TextInputMask } from "react-native-masked-text";
 import estilo from "./css";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -46,6 +51,8 @@ export default function ListPassageiro({ navigation }) {
   const [nome, setNome] = useState("");
   const [visible, setModalVisible] = useState(false);
   const [image, setImage] = useState(null);
+  const [image2, setImage2] = useState(null);
+  const [uri, setUri] = useState(null);
   const [imageName, setImageName] = useState("");
   const [cad, setcad] = useState(false);
   const [form, setForm] = useState({
@@ -132,8 +139,7 @@ export default function ListPassageiro({ navigation }) {
     const storage = getStorage();
     const storageRef = ref(storage, `Contratos/${imageName}`);
     uploadBytes(storageRef, image.raw)
-      .then((snapshot) => {
-      })
+      .then((snapshot) => {})
       .catch((error) => {
         console.log("Erro ao fazer upload");
       });
@@ -162,6 +168,12 @@ export default function ListPassageiro({ navigation }) {
   }
 
   const muda = async (item) => {
+    const storage = getStorage();
+    getDownloadURL(ref(storage, `Contratos/${item.Contrato}`)).then((url) => {
+      setUri(url);
+      setImage2(true);
+    });
+
     await setForm({
       Nome: item.Nome,
       RG: item.RG,
@@ -186,14 +198,20 @@ export default function ListPassageiro({ navigation }) {
   };
 
   const excluir = async (user) => {
+    const storage = getStorage();
+    const desertRef = ref(storage, `Contratos/${user.Contrato}`);
     const db = getFirestore();
-    const q = query(collection(db, "Passageiros"), where("Nome", "==", user));
+    const q = query(
+      collection(db, "Passageiros"),
+      where("Nome", "==", user.Nome)
+    );
     const querySnapshot = await getDocs(q);
     let id = "";
     querySnapshot.forEach((doc) => {
       id = doc.id;
     });
     await deleteDoc(doc(db, "Passageiros", id));
+    deleteObject(desertRef).then(() => {});
     alert("Registro excluído!");
     instituicoes();
   };
@@ -201,7 +219,7 @@ export default function ListPassageiro({ navigation }) {
   const add = async () => {
     setSubmit("Cadastro");
     setModalVisible(!visible);
-    setcad(true)
+    setcad(true);
   };
 
   const renderItem = ({ item }) => {
@@ -278,10 +296,7 @@ export default function ListPassageiro({ navigation }) {
             <Pressable style={estilo.btncard} onPress={() => muda(item)}>
               <Ionicons name="pencil-outline" size={25} color={"white"} />
             </Pressable>
-            <Pressable
-              style={estilo.btncard}
-              onPress={() => excluir(item.Nome)}
-            >
+            <Pressable style={estilo.btncard} onPress={() => excluir(item)}>
               <Ionicons name="trash-outline" size={25} color={"white"} />
             </Pressable>
           </Card.Actions>
@@ -313,7 +328,7 @@ export default function ListPassageiro({ navigation }) {
       Complemento: form.Complemento,
       Contato: form.Contato,
       Email: form.Email,
-      Contrato: form.Contrato,
+      Contrato: imageName,
     });
     await uploadImage();
   }
@@ -323,9 +338,11 @@ export default function ListPassageiro({ navigation }) {
       const db = getFirestore();
       await deleteDoc(doc(db, "Passageiros", nome));
       cadastra();
+      setImage2(false);
       alert("Edição realizada!");
     } else if (submit == "Cadastro") {
       cadastra();
+      setImage(false);
       alert("Cadastro realizado!");
     }
     setModalVisible(!visible);
@@ -452,6 +469,8 @@ export default function ListPassageiro({ navigation }) {
                   Contrato: "",
                 });
                 setdropcfp(false);
+                setImage(false);
+                setImage2(false);
               }}
               style={{ alignSelf: "flex-end" }}
             />
@@ -534,7 +553,7 @@ export default function ListPassageiro({ navigation }) {
                   onSelect={(selectedItem, index) => {
                     updateForm({ EstadoCivil: selectedItem });
                   }}
-                  defaultButtonText={"Estado Civil"}
+                  defaultButtonText={form.EstadoCivil}
                   buttonTextAfterSelection={(selectedItem, index) => {
                     return selectedItem;
                   }}
@@ -559,7 +578,7 @@ export default function ListPassageiro({ navigation }) {
                   onSelect={(selectedItem, index) => {
                     updateForm({ Instituicao: selectedItem });
                   }}
-                  defaultButtonText={"Instituição"}
+                  defaultButtonText={form.Instituicao}
                   buttonTextAfterSelection={(selectedItem, index) => {
                     return selectedItem;
                   }}
@@ -691,16 +710,20 @@ export default function ListPassageiro({ navigation }) {
                     />
                   </View>
                 )}
-                {cad && (
-                  <input
+                <input
                   type="file"
                   onChange={pickImage}
                   style={{ margin: "2%" }}
-                />                
-                )}
+                />
                 {image && (
                   <Image
                     source={image.preview}
+                    style={{ width: 200, height: 200, margin: "1%" }}
+                  />
+                )}
+                {image2 && (
+                  <Image
+                    source={{ uri: uri }}
                     style={{ width: 200, height: 200, margin: "1%" }}
                   />
                 )}
