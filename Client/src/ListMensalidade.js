@@ -355,20 +355,6 @@ export default function ListMensalidade({ navigation }) {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
         />
-        <TouchableOpacity
-            style={{
-              backgroundColor: "#004A85",
-              width: "auto",
-              height: 45,
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 10,
-              marginLeft: "1.5%",
-            }}
-            onPress={() => excluir()}
-          >
-            <Text style={estilo.textBtn2}>Excluir todas mensalidades</Text>
-          </TouchableOpacity>
         <Modal
           animationType="slide"
           transparent={true}
@@ -573,6 +559,7 @@ const style = StyleSheet.create({
   },
   linha: {
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: "2%",
@@ -584,7 +571,7 @@ const style = StyleSheet.create({
   },
   input: {
     backgroundColor: "#F5F5F5",
-    width: "90%",
+    width: "50%",
     color: "#000000",
     fontSize: RFPercentage(1.5),
     borderRadius: 10,

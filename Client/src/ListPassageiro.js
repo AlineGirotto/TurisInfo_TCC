@@ -55,6 +55,8 @@ export default function ListPassageiro({ navigation }) {
   const [uri, setUri] = useState(null);
   const [imageName, setImageName] = useState("");
   const [cad, setcad] = useState(false);
+  const [x, setX] = useState("Estado Civil");
+  const [y, setY] = useState("Instituição");
   const [form, setForm] = useState({
     Nome: "",
     RG: "",
@@ -191,6 +193,8 @@ export default function ListPassageiro({ navigation }) {
       Contrato: item.Contrato,
     });
     setSubmit("Edição");
+    setX(item.EstadoCivil);
+    setY(item.Instituicao);
     setNome(item.Nome);
     setModalVisible(!visible);
     setdropcfp(true);
@@ -214,6 +218,7 @@ export default function ListPassageiro({ navigation }) {
     deleteObject(desertRef).then(() => {});
     alert("Registro excluído!");
     instituicoes();
+    passageiros();
   };
 
   const add = async () => {
@@ -553,7 +558,7 @@ export default function ListPassageiro({ navigation }) {
                   onSelect={(selectedItem, index) => {
                     updateForm({ EstadoCivil: selectedItem });
                   }}
-                  defaultButtonText={form.EstadoCivil}
+                  defaultButtonText={x}
                   buttonTextAfterSelection={(selectedItem, index) => {
                     return selectedItem;
                   }}
@@ -578,7 +583,7 @@ export default function ListPassageiro({ navigation }) {
                   onSelect={(selectedItem, index) => {
                     updateForm({ Instituicao: selectedItem });
                   }}
-                  defaultButtonText={form.Instituicao}
+                  defaultButtonText={y}
                   buttonTextAfterSelection={(selectedItem, index) => {
                     return selectedItem;
                   }}
@@ -628,7 +633,9 @@ export default function ListPassageiro({ navigation }) {
                 <TextInput
                   style={estilo.input}
                   placeholder="Digite o e-mail"
+                  autoComplete="email"
                   value={form.Email}
+                  keyboardType="email-address"
                   onChangeText={(e) => updateForm({ Email: e })}
                 />
                 <View
