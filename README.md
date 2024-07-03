@@ -1,8 +1,10 @@
 # Projeto Turis Info
 
 ## Descrição
-Trabalho de conclusão de curso de ADS do IFRS-Sertão, o projeto consiste em um sistema web responsivo com conceito serverless. Tem como principal objetivo o gerenciamento de uma empresa de fretamento de viagens de alunos e trabalhadores à outras cidades.
+Desenvolvimento de um software que auxilia na gestão de fretamentos, viagens e passageiros. O projeto é construído em torno dos conceitos de responsividade web e serverless, utilizando a biblioteca React Native e a plataforma Firebase, visando melhorar o controle de viagens, veículos, contratos e passageiros, visando uma melhor organização e crescimento na gestão do negócio. 
+Este projeto foi desenvolvido como Trabalho de Conclusão de Curso do curso Análise e Desenvolvimento de Sistemas do Instituto Federal de Educação, Ciência e Tecnologia do Rio Grande do Sul - Campus Sertão.
 
-### Construção com:
-* React e React native (Expo) 
-* Firebase
+### Tecnologias utilizadas:
+✔ React e React native
+✔ Expo
+✔ Firebase
