@@ -5,6 +5,6 @@ Desenvolvimento de um software que auxilia na gestão de fretamentos, viagens e 
 Este projeto foi desenvolvido como Trabalho de Conclusão de Curso do curso Análise e Desenvolvimento de Sistemas do Instituto Federal de Educação, Ciência e Tecnologia do Rio Grande do Sul - Campus Sertão.
 
 ### Tecnologias utilizadas:
-✔ React e React native
-✔ Expo
-✔ Firebase
+✔ React e React native </br>
+✔ Expo </br>
+✔ Firebase </br>
